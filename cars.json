@@ -1,0 +1,54 @@
+[
+  {
+    "id": "skoda-octavia-2024-style",
+    "make": "סקודה",
+    "model": "אוקטביה",
+    "trim": "Style",
+    "year": 2024,
+    "price": 164900,
+    "gearbox": "אוטומטית",
+    "engine": 1.5,
+    "image": "https://images.unsplash.com/photo-1549921296-3fdc4f19b7a5?q=80&w=1200&auto=format&fit=crop",
+    "features": { "cruise": true, "rearCamera": true, "keyless": false, "laneAssist": true, "aeb": true },
+    "specs": { "length": 4689, "width": 1829, "height": 1470, "wheelbase": 2686, "trunk": 600, "powerHP": 150 }
+  },
+  {
+    "id": "seat-ateca-2023-style",
+    "make": "סיאט",
+    "model": "אטקה",
+    "trim": "Style",
+    "year": 2023,
+    "price": 149900,
+    "gearbox": "אוטומטית",
+    "engine": 1.5,
+    "image": "https://images.unsplash.com/photo-1523986371872-9d3ba2e2b1a9?q=80&w=1200&auto=format&fit=crop",
+    "features": { "cruise": true, "rearCamera": true, "keyless": true, "laneAssist": false, "aeb": true },
+    "specs": { "length": 4381, "width": 1841, "height": 1615, "wheelbase": 2638, "trunk": 510, "powerHP": 150 }
+  },
+  {
+    "id": "cupra-formentor-2024",
+    "make": "קופרה",
+    "model": "פורמנטור",
+    "trim": "",
+    "year": 2024,
+    "price": 209900,
+    "gearbox": "אוטומטית",
+    "engine": 2.0,
+    "image": "https://images.unsplash.com/photo-1616628188461-8e2b6cbaa607?q=80&w=1200&auto=format&fit=crop",
+    "features": { "cruise": true, "rearCamera": true, "keyless": true, "laneAssist": true, "aeb": true },
+    "specs": { "length": 4450, "width": 1839, "height": 1511, "wheelbase": 2679, "trunk": 450, "powerHP": 190 }
+  },
+  {
+    "id": "toyota-corolla-2024",
+    "make": "טויוטה",
+    "model": "קורולה",
+    "trim": "",
+    "year": 2024,
+    "price": 139900,
+    "gearbox": "רובוטית",
+    "engine": 1.8,
+    "image": "https://images.unsplash.com/photo-1549923746-c502d488b3ea?q=80&w=1200&auto=format&fit=crop",
+    "features": { "cruise": true, "rearCamera": true, "keyless": false, "laneAssist": true, "aeb": true },
+    "specs": { "length": 4630, "width": 1780, "height": 1435, "wheelbase": 2700, "trunk": 471, "powerHP": 122 }
+  }
+]
