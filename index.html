@@ -17,7 +17,7 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-  <!-- ===== דאטה לדמו (ניתן להרחיב בהמשך) ===== -->
+  <!-- ===== דאטה לדמו (אפשר להרחיב בהמשך) ===== -->
   <script>
     const CARS = [
       {
@@ -131,7 +131,7 @@
 
         e('main',{className:'max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6'},
 
-          // סide: פילטרים
+          // פילטרים
           e('aside',{className:'lg:col-span-4 xl:col-span-3'},
             e('div',{className:'bg-white rounded-2xl shadow p-4'},
               e('div',{className:'mb-3'},
@@ -222,7 +222,7 @@
                       ['features.cruise','בקרת שיוט', (v)=>v?'✔':'✖', (c)=>c.features.cruise],
                       ['features.rearCamera','מצלמה אחורית', (v)=>v?'✔':'✖', (c)=>c.features.rearCamera],
                       ['features.keyless','Keyless', (v)=>v?'✔':'✖', (c)=>c.features.keyless],
-                      ['features.laneAssist','שמירת נתיב', (v)=>v?'✔':'✖', (c)=>c.features.laneAssist],
+                      ['features.laneAssist','שמירת נתיב', (v)=>v?'✔':'✖', (c)=>c.features.llaneAssist],
                       ['features.aeb','בלימה אוטונומית', (v)=>v?'✔':'✖', (c)=>c.features.aeb],
                     ].map(([key,label,fmt,get])=>
                       e('tr',{key, className:'border-t'},
