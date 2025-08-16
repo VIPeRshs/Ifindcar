@@ -17,68 +17,23 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-  <!-- ===== דאטה לדמו (אפשר להרחיב בהמשך) ===== -->
+  <!-- טוען דאטה חיצוני מ-cars.json -->
   <script>
-    const CARS = [
-      {
-        id: "skoda-octavia-2024-style",
-        make: "סקודה",
-        model: "אוקטביה",
-        trim: "Style",
-        year: 2024,
-        price: 164900,
-        gearbox: "אוטומטית",
-        engine: 1.5,
-        image: "https://images.unsplash.com/photo-1549921296-3fdc4f19b7a5?q=80&w=1200&auto=format&fit=crop",
-        features: { cruise: true, rearCamera: true, keyless: false, laneAssist: true, aeb: true },
-        specs: { length: 4689, width: 1829, height: 1470, wheelbase: 2686, trunk: 600, powerHP: 150 }
-      },
-      {
-        id: "seat-ateca-2023-style",
-        make: "סיאט",
-        model: "אטקה",
-        trim: "Style",
-        year: 2023,
-        price: 149900,
-        gearbox: "אוטומטית",
-        engine: 1.5,
-        image: "https://images.unsplash.com/photo-1523986371872-9d3ba2e2b1a9?q=80&w=1200&auto=format&fit=crop",
-        features: { cruise: true, rearCamera: true, keyless: true, laneAssist: false, aeb: true },
-        specs: { length: 4381, width: 1841, height: 1615, wheelbase: 2638, trunk: 510, powerHP: 150 }
-      },
-      {
-        id: "cupra-formentor-2024",
-        make: "קופרה",
-        model: "פורמנטור",
-        trim: "",
-        year: 2024,
-        price: 209900,
-        gearbox: "אוטומטית",
-        engine: 2.0,
-        image: "https://images.unsplash.com/photo-1616628188461-8e2b6cbaa607?q=80&w=1200&auto=format&fit=crop",
-        features: { cruise: true, rearCamera: true, keyless: true, laneAssist: true, aeb: true },
-        specs: { length: 4450, width: 1839, height: 1511, wheelbase: 2679, trunk: 450, powerHP: 190 }
-      },
-      {
-        id: "toyota-corolla-2024",
-        make: "טויוטה",
-        model: "קורולה",
-        trim: "",
-        year: 2024,
-        price: 139900,
-        gearbox: "רובוטית",
-        engine: 1.8,
-        image: "https://images.unsplash.com/photo-1549923746-c502d488b3ea?q=80&w=1200&auto=format&fit=crop",
-        features: { cruise: true, rearCamera: true, keyless: false, laneAssist: true, aeb: true },
-        specs: { length: 4630, width: 1780, height: 1435, wheelbase: 2700, trunk: 471, powerHP: 122 }
+    window.__CARS__ = [];
+    async function loadCars() {
+      try {
+        const res = await fetch('./cars.json', { cache: 'no-store' });
+        window.__CARS__ = await res.json();
+      } catch (e) {
+        window.__CARS__ = [];
       }
-    ];
+    }
   </script>
 
-  <!-- ===== אפליקציה ===== -->
+  <!-- אפליקציה -->
   <script>
     const e = React.createElement;
-    const { useMemo, useState } = React;
+    const { useEffect, useMemo, useState } = React;
 
     const Badge = ({children}) => e('span',{className:'chip'},children);
 
@@ -97,15 +52,27 @@
     }
 
     function App(){
+      // --- NEW: טוען את הדאטה מ-cars.json לתוך state ---
+      const [ready,setReady] = useState(false);
+      const [cars,setCars]   = useState([]);
+
+      useEffect(()=>{
+        (async ()=>{
+          await loadCars();
+          setCars(window.__CARS__ || []);
+          setReady(true);
+        })();
+      }, []);
+
       const [query,setQuery]=useState('');
       const [maxPrice,setMaxPrice]=useState(230000);
       const [gearbox,setGearbox]=useState('הכל');
       const [feat,setFeat]=useState({cruise:false,rearCamera:false,keyless:false,laneAssist:false,aeb:false});
       const [compare,setCompare]=useState([]);
 
-      const gearboxes = useMemo(()=>['הכל', ...Array.from(new Set(CARS.map(c=>c.gearbox)))], []);
+      const gearboxes = useMemo(()=>['הכל', ...Array.from(new Set(cars.map(c=>c.gearbox)))], [cars]);
 
-      const filtered = useMemo(()=>CARS.filter(c=>
+      const filtered = useMemo(()=>cars.filter(c=>
         c.price<=maxPrice &&
         (gearbox==='הכל' || c.gearbox===gearbox) &&
         (query.trim()==='' || (c.make+' '+c.model+' '+(c.trim||'')).includes(query.trim())) &&
@@ -114,12 +81,12 @@
         (!feat.keyless || c.features.keyless) &&
         (!feat.laneAssist || c.features.laneAssist) &&
         (!feat.aeb || c.features.aeb)
-      ),[maxPrice,gearbox,feat,query]);
+      ),[cars,maxPrice,gearbox,feat,query]);
 
       function toggleCompare(id){
         setCompare(curr=>curr.includes(id)? curr.filter(x=>x!==id) : (curr.length<3?[...curr,id]:curr));
       }
-      const selected = CARS.filter(c=>compare.includes(c.id));
+      const selected = cars.filter(c=>compare.includes(c.id));
 
       return e('div',{className:'min-h-screen'},
         e('header',{className:'sticky top-0 z-10 bg-white/80 backdrop-blur border-b'},
@@ -171,11 +138,11 @@
           // תוצאות
           e('section',{className:'lg:col-span-8 xl:col-span-9'},
             e('div',{className:'flex items-center justify-between mb-3'},
-              e('div',{className:'text-sm opacity-70'},`נמצאו ${filtered.length} רכבים`),
+              e('div',{className:'text-sm opacity-70'}, ready ? `נמצאו ${filtered.length} רכבים` : 'טוען נתונים...'),
               selected.length>1 && e('a',{href:'#compare',className:'rounded-xl px-3 py-2 bg-black text-white text-sm'},'השווה עכשיו')
             ),
             e('div',{className:'grid sm:grid-cols-2 xl:grid-cols-3 gap-4'},
-              filtered.map(c=>e('article',{key:c.id,className:'bg-white rounded-2xl shadow overflow-hidden flex flex-col'},
+              (ready?filtered:[]).map(c=>e('article',{key:c.id,className:'bg-white rounded-2xl shadow overflow-hidden flex flex-col'},
                 e('img',{src:c.image,alt:'car',className:'h-40 w-full object-cover'}),
                 e('div',{className:'p-4 flex-1 flex flex-col gap-2'},
                   e('h3',{className:'font-semibold text-lg'},`${c.make} ${c.model} ${c.trim? '• '+c.trim:''}`),
@@ -222,7 +189,7 @@
                       ['features.cruise','בקרת שיוט', (v)=>v?'✔':'✖', (c)=>c.features.cruise],
                       ['features.rearCamera','מצלמה אחורית', (v)=>v?'✔':'✖', (c)=>c.features.rearCamera],
                       ['features.keyless','Keyless', (v)=>v?'✔':'✖', (c)=>c.features.keyless],
-                      ['features.laneAssist','שמירת נתיב', (v)=>v?'✔':'✖', (c)=>c.features.llaneAssist],
+                      ['features.laneAssist','שמירת נתיב', (v)=>v?'✔':'✖', (c)=>c.features.laneAssist],
                       ['features.aeb','בלימה אוטונומית', (v)=>v?'✔':'✖', (c)=>c.features.aeb],
                     ].map(([key,label,fmt,get])=>
                       e('tr',{key, className:'border-t'},
@@ -248,4 +215,4 @@
     ReactDOM.createRoot(document.getElementById('app')).render(React.createElement(App));
   </script>
 </body>
-</html>
+</html> 
