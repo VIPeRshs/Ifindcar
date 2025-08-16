@@ -1,34 +1,251 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>iFindCar · דמו</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
   <style>
     body{background:#f7f7fb}
-    .card{background:#fff;border-radius:12px;box-shadow:0 4px 8px rgba(0,0,0,.06)}
+    .chip{display:inline-block;border:1px solid #e5e7eb;border-radius:999px;padding:.15rem .55rem;font-size:.75rem}
   </style>
 </head>
 <body class="text-gray-900">
-  <div id="app" class="min-h-screen">
-    <header class="sticky top-0 z-10 bg-white/80 backdrop-blur border-b">
-      <div class="max-w-4xl mx-auto px-4 py-3">
-        <h1 class="text-2xl font-bold">iFindCar · דף פתיחה</h1>
-      </div>
-    </header>
+  <div id="app" class="min-h-screen"></div>
 
-    <main class="max-w-4xl mx-auto px-4 py-8">
-      <section class="card p-6">
-        <h2 class="text-xl font-semibold mb-2">🚗 ברוך הבא ל־iFindCar</h2>
-        <p class="opacity-80">זהו דף פתיחה ראשוני. הדף הזה נועד לוודא ש-GitHub Pages עובד.</p>
-        <p class="mt-2 text-sm opacity-70">אחרי שזה נטען תקין, אוסיף פה דמו אמיתי עם סינון והשוואה.</p>
-      </section>
-    </main>
+  <!-- React (CDN) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-    <footer class="max-w-4xl mx-auto px-4 pb-10 pt-2 text-xs opacity-60">
-      © iFindCar – דמו ראשוני
-    </footer>
-  </div>
+  <!-- ===== דאטה לדמו (ניתן להרחיב בהמשך) ===== -->
+  <script>
+    const CARS = [
+      {
+        id: "skoda-octavia-2024-style",
+        make: "סקודה",
+        model: "אוקטביה",
+        trim: "Style",
+        year: 2024,
+        price: 164900,
+        gearbox: "אוטומטית",
+        engine: 1.5,
+        image: "https://images.unsplash.com/photo-1549921296-3fdc4f19b7a5?q=80&w=1200&auto=format&fit=crop",
+        features: { cruise: true, rearCamera: true, keyless: false, laneAssist: true, aeb: true },
+        specs: { length: 4689, width: 1829, height: 1470, wheelbase: 2686, trunk: 600, powerHP: 150 }
+      },
+      {
+        id: "seat-ateca-2023-style",
+        make: "סיאט",
+        model: "אטקה",
+        trim: "Style",
+        year: 2023,
+        price: 149900,
+        gearbox: "אוטומטית",
+        engine: 1.5,
+        image: "https://images.unsplash.com/photo-1523986371872-9d3ba2e2b1a9?q=80&w=1200&auto=format&fit=crop",
+        features: { cruise: true, rearCamera: true, keyless: true, laneAssist: false, aeb: true },
+        specs: { length: 4381, width: 1841, height: 1615, wheelbase: 2638, trunk: 510, powerHP: 150 }
+      },
+      {
+        id: "cupra-formentor-2024",
+        make: "קופרה",
+        model: "פורמנטור",
+        trim: "",
+        year: 2024,
+        price: 209900,
+        gearbox: "אוטומטית",
+        engine: 2.0,
+        image: "https://images.unsplash.com/photo-1616628188461-8e2b6cbaa607?q=80&w=1200&auto=format&fit=crop",
+        features: { cruise: true, rearCamera: true, keyless: true, laneAssist: true, aeb: true },
+        specs: { length: 4450, width: 1839, height: 1511, wheelbase: 2679, trunk: 450, powerHP: 190 }
+      },
+      {
+        id: "toyota-corolla-2024",
+        make: "טויוטה",
+        model: "קורולה",
+        trim: "",
+        year: 2024,
+        price: 139900,
+        gearbox: "רובוטית",
+        engine: 1.8,
+        image: "https://images.unsplash.com/photo-1549923746-c502d488b3ea?q=80&w=1200&auto=format&fit=crop",
+        features: { cruise: true, rearCamera: true, keyless: false, laneAssist: true, aeb: true },
+        specs: { length: 4630, width: 1780, height: 1435, wheelbase: 2700, trunk: 471, powerHP: 122 }
+      }
+    ];
+  </script>
+
+  <!-- ===== אפליקציה ===== -->
+  <script>
+    const e = React.createElement;
+    const { useMemo, useState } = React;
+
+    const Badge = ({children}) => e('span',{className:'chip'},children);
+
+    function Range({label,min,max,step=1000,value,onChange,format}){
+      return e('div',{className:'mb-4'},
+        e('div',{className:'flex items-center justify-between mb-1'},
+          e('span',{className:'text-sm font-medium'},label),
+          e('span',{className:'text-sm opacity-70'},format(value))
+        ),
+        e('input',{type:'range',min,max,step,value,onChange:(ev)=>onChange(Number(ev.target.value)),className:'w-full'}),
+        e('div',{className:'flex justify-between text-xs opacity-60 mt-1'},
+          e('span',null,format(min)),
+          e('span',null,format(max))
+        ),
+      );
+    }
+
+    function App(){
+      const [query,setQuery]=useState('');
+      const [maxPrice,setMaxPrice]=useState(230000);
+      const [gearbox,setGearbox]=useState('הכל');
+      const [feat,setFeat]=useState({cruise:false,rearCamera:false,keyless:false,laneAssist:false,aeb:false});
+      const [compare,setCompare]=useState([]);
+
+      const gearboxes = useMemo(()=>['הכל', ...Array.from(new Set(CARS.map(c=>c.gearbox)))], []);
+
+      const filtered = useMemo(()=>CARS.filter(c=>
+        c.price<=maxPrice &&
+        (gearbox==='הכל' || c.gearbox===gearbox) &&
+        (query.trim()==='' || (c.make+' '+c.model+' '+(c.trim||'')).includes(query.trim())) &&
+        (!feat.cruise || c.features.cruise) &&
+        (!feat.rearCamera || c.features.rearCamera) &&
+        (!feat.keyless || c.features.keyless) &&
+        (!feat.laneAssist || c.features.laneAssist) &&
+        (!feat.aeb || c.features.aeb)
+      ),[maxPrice,gearbox,feat,query]);
+
+      function toggleCompare(id){
+        setCompare(curr=>curr.includes(id)? curr.filter(x=>x!==id) : (curr.length<3?[...curr,id]:curr));
+      }
+      const selected = CARS.filter(c=>compare.includes(c.id));
+
+      return e('div',{className:'min-h-screen'},
+        e('header',{className:'sticky top-0 z-10 bg-white/80 backdrop-blur border-b'},
+          e('div',{className:'max-w-6xl mx-auto px-4 py-3 flex items-center justify-between'},
+            e('h1',{className:'text-xl sm:text-2xl font-bold'},'iFindCar · דמו'),
+            selected.length>0 && e(Badge,null,`להשוואה: ${selected.length}/3`)
+          )
+        ),
+
+        e('main',{className:'max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6'},
+
+          // סide: פילטרים
+          e('aside',{className:'lg:col-span-4 xl:col-span-3'},
+            e('div',{className:'bg-white rounded-2xl shadow p-4'},
+              e('div',{className:'mb-3'},
+                e('label',{className:'text-sm font-medium'},'חיפוש דגם'),
+                e('input',{value:query,onChange:(ev)=>setQuery(ev.target.value),placeholder:'לדוגמה: אוקטביה',className:'mt-1 w-full rounded-xl border px-3 py-2 focus:outline-none focus:ring'})
+              ),
+              e(Range,{label:'מחיר מקסימלי',min:120000,max:230000,step:1000,value:maxPrice,onChange:setMaxPrice,format:(v)=>v.toLocaleString()+' ₪'}),
+              e('div',{className:'mb-3'},
+                e('label',{className:'text-sm font-medium'},'תיבת הילוכים'),
+                e('select',{className:'mt-1 w-full rounded-xl border px-3 py-2',value:gearbox,onChange:(ev)=>setGearbox(ev.target.value)},
+                  gearboxes.map(g=>e('option',{key:g,value:g},g))
+                )
+              ),
+              e('div',{className:'mt-4'},
+                e('span',{className:'text-sm font-medium'},'איבזור'),
+                e('div',{className:'mt-2 grid grid-cols-1 gap-2'},
+                  [['cruise','בקרת שיוט'],['rearCamera','מצלמה אחורית'],['keyless','Keyless'],['laneAssist','שמירת נתיב'],['aeb','בלימה אוטונומית']]
+                  .map(([key,label])=>e('label',{key,className:'flex items-center gap-2 text-sm'},
+                    e('input',{type:'checkbox',checked:feat[key],onChange:(ev)=>setFeat({...feat,[key]:ev.target.checked})}),
+                    label
+                  ))
+                )
+              )
+            ),
+
+            selected.length>0 && e('div',{className:'mt-4 bg-white rounded-2xl shadow p-4'},
+              e('h3',{className:'font-semibold mb-2'},'השוואה מהירה'),
+              e('ul',{className:'text-sm space-y-1'},
+                selected.map(c=>e('li',{key:c.id,className:'flex items-center justify-between'},
+                  e('span',null,`${c.make} ${c.model}`),
+                  e('button',{className:'text-xs underline opacity-70',onClick:()=>toggleCompare(c.id)},'הסר')
+                ))
+              )
+            )
+          ),
+
+          // תוצאות
+          e('section',{className:'lg:col-span-8 xl:col-span-9'},
+            e('div',{className:'flex items-center justify-between mb-3'},
+              e('div',{className:'text-sm opacity-70'},`נמצאו ${filtered.length} רכבים`),
+              selected.length>1 && e('a',{href:'#compare',className:'rounded-xl px-3 py-2 bg-black text-white text-sm'},'השווה עכשיו')
+            ),
+            e('div',{className:'grid sm:grid-cols-2 xl:grid-cols-3 gap-4'},
+              filtered.map(c=>e('article',{key:c.id,className:'bg-white rounded-2xl shadow overflow-hidden flex flex-col'},
+                e('img',{src:c.image,alt:'car',className:'h-40 w-full object-cover'}),
+                e('div',{className:'p-4 flex-1 flex flex-col gap-2'},
+                  e('h3',{className:'font-semibold text-lg'},`${c.make} ${c.model} ${c.trim? '• '+c.trim:''}`),
+                  e('div',{className:'text-sm opacity-70'},`${c.year} • ${c.gearbox} • ${c.engine} ל׳`),
+                  e('div',{className:'text-base font-bold'}, c.price.toLocaleString() + ' ₪'),
+                  e('div',{className:'flex flex-wrap gap-1 mt-1'},
+                    c.features.cruise && e(Badge,null,'שיוט'),
+                    c.features.rearCamera && e(Badge,null,'מצלמה'),
+                    c.features.keyless && e(Badge,null,'Keyless'),
+                    c.features.laneAssist && e(Badge,null,'שמירת נתיב'),
+                    c.features.aeb && e(Badge,null,'AEB'),
+                  ),
+                  e('div',{className:'mt-auto flex items-center justify-between pt-2'},
+                    e('a',{href:'#compare',onClick:(ev)=>{ev.preventDefault();toggleCompare(c.id);},className:`text-sm underline ${compare.includes(c.id)?'opacity-100':'opacity-70'}`},
+                      compare.includes(c.id)?'ברשימת השוואה':'הוסף להשוואה'
+                    ),
+                    e('span',{className:'text-xs opacity-60'}, `תא מטען ${c.specs.trunk} ל׳`)
+                  )
+                )
+              ))
+            ),
+
+            selected.length>1 && e('div',{id:'compare',className:'mt-8 bg-white rounded-2xl shadow p-4'},
+              e('h3',{className:'font-semibold text-lg mb-3'},'טבלת השוואה'),
+              e('div',{className:'overflow-auto'},
+                e('table',{className:'min-w-full text-sm'},
+                  e('thead',null,
+                    e('tr',{className:'text-left'},
+                      e('th',{className:'p-2'},'מאפיין'),
+                      selected.map(c=>e('th',{key:c.id,className:'p-2 whitespace-nowrap'}, `${c.make} ${c.model}`))
+                    )
+                  ),
+                  e('tbody',null,
+                    [
+                      ['price','מחיר', (v)=>v.toLocaleString()+' ₪', (c)=>c.price],
+                      ['gearbox','תיבה', null, (c)=>c.gearbox],
+                      ['engine','נפח מנוע (ל׳)', null, (c)=>c.engine],
+                      ['length','אורך (מ״מ)', null, (c)=>c.specs.length],
+                      ['width','רוחב (מ״מ)', null, (c)=>c.specs.width],
+                      ['height','גובה (מ״מ)', null, (c)=>c.specs.height],
+                      ['wheelbase','בסיס גלגלים (מ״מ)', null, (c)=>c.specs.wheelbase],
+                      ['trunk','תא מטען (ל׳)', null, (c)=>c.specs.trunk],
+                      ['powerHP','כ״ס', null, (c)=>c.specs.powerHP],
+                      ['features.cruise','בקרת שיוט', (v)=>v?'✔':'✖', (c)=>c.features.cruise],
+                      ['features.rearCamera','מצלמה אחורית', (v)=>v?'✔':'✖', (c)=>c.features.rearCamera],
+                      ['features.keyless','Keyless', (v)=>v?'✔':'✖', (c)=>c.features.keyless],
+                      ['features.laneAssist','שמירת נתיב', (v)=>v?'✔':'✖', (c)=>c.features.laneAssist],
+                      ['features.aeb','בלימה אוטונומית', (v)=>v?'✔':'✖', (c)=>c.features.aeb],
+                    ].map(([key,label,fmt,get])=>
+                      e('tr',{key, className:'border-t'},
+                        e('td',{className:'p-2 font-medium whitespace-nowrap'},label),
+                        selected.map(c=>{
+                          const val = get(c);
+                          const disp = fmt? fmt(val): val;
+                          return e('td',{key:c.id+key, className:'p-2 whitespace-nowrap'}, disp);
+                        })
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        ),
+
+        e('footer',{className:'max-w-6xl mx-auto px-4 pb-8 pt-2 text-xs opacity-60'}, 'דמו בסיסי • נתוני הדגמה בלבד')
+      );
+    }
+
+    ReactDOM.createRoot(document.getElementById('app')).render(React.createElement(App));
+  </script>
 </body>
 </html>
