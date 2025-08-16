@@ -3,7 +3,7 @@ name: Scrape iCar to cars.json
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "0 6 * * *"   # כל יום ב-06:00 UTC (09:00 שעון ישראל בקיץ בערך)
+    - cron: "0 6 * * *" # כל יום 06:00 UTC (בסביבות 09:00 בישראל בקיץ)
 
 permissions:
   contents: write
