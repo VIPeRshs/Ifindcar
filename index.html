@@ -8,6 +8,7 @@
   <style>
     body{background:#f7f7fb}
     .chip{display:inline-block;border:1px solid #e5e7eb;border-radius:999px;padding:.15rem .55rem;font-size:.75rem}
+    input[type=range] { accent-color: #111; }
   </style>
 </head>
 <body class="text-gray-900">
@@ -17,76 +18,136 @@
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
 
-  <!-- טוען דאטה חיצוני מ-cars.json -->
+  <!-- טעינת דאטה מ-cars.json עם פולבאקים -->
   <script>
     window.__CARS__ = [];
-    async function loadCars() {
-      try {
-        const res = await fetch('./cars.json', { cache: 'no-store' });
-        window.__CARS__ = await res.json();
-      } catch (e) {
-        window.__CARS__ = [];
+    async function tryFetch(path){ const r=await fetch(path,{cache:'no-store'}); if(!r.ok) throw new Error(r.status); return r.json(); }
+    async function loadCars(){
+      for (const p of ['cars.json','./cars.json','docs/cars.json','./docs/cars.json']){
+        try{ window.__CARS__ = await tryFetch(p); console.log('Loaded',p); return; }catch(_){}
       }
+      window.__CARS__ = [];
     }
   </script>
 
-  <!-- אפליקציה -->
   <script>
     const e = React.createElement;
     const { useEffect, useMemo, useState } = React;
 
     const Badge = ({children}) => e('span',{className:'chip'},children);
 
-    function Range({label,min,max,step=1000,value,onChange,format}){
+    function Range({label,min,max,step=1,value,onChange,format}){
       return e('div',{className:'mb-4'},
         e('div',{className:'flex items-center justify-between mb-1'},
           e('span',{className:'text-sm font-medium'},label),
-          e('span',{className:'text-sm opacity-70'},format(value))
+          e('span',{className:'text-sm opacity-70'},format?format(value):value)
         ),
         e('input',{type:'range',min,max,step,value,onChange:(ev)=>onChange(Number(ev.target.value)),className:'w-full'}),
         e('div',{className:'flex justify-between text-xs opacity-60 mt-1'},
-          e('span',null,format(min)),
-          e('span',null,format(max))
+          e('span',null,format?format(min):min),
+          e('span',null,format?format(max):max)
         ),
       );
     }
 
     function App(){
-      // --- NEW: טוען את הדאטה מ-cars.json לתוך state ---
-      const [ready,setReady] = useState(false);
-      const [cars,setCars]   = useState([]);
+      const [ready,setReady]   = useState(false);
+      const [error,setError]   = useState('');
+      const [cars,setCars]     = useState([]);
 
+      // פילטרים
+      const [query,setQuery]   = useState('');
+      const [maxPrice,setMaxPrice] = useState(230000);
+      const [gearbox,setGearbox]   = useState('הכל');
+      const [feat,setFeat] = useState({cruise:false,rearCamera:false,keyless:false,laneAssist:false,aeb:false});
+
+      // פילטרים חדשים
+      const [yearMin,setYearMin] = useState(2000);
+      const [yearMax,setYearMax] = useState(2030);
+      const [engineMin,setEngineMin] = useState(0);        // בליטרים
+      const [powerMin,setPowerMin]   = useState(0);        // כ"ס
+      const [trunkMin,setTrunkMin]   = useState(0);        // ליטרים
+
+      // השוואה
+      const [compare,setCompare] = useState([]);
+
+      // טעינת דאטה
       useEffect(()=>{
         (async ()=>{
-          await loadCars();
-          setCars(window.__CARS__ || []);
-          setReady(true);
+          try{
+            await loadCars();
+            setCars(window.__CARS__ || []);
+            setReady(true);
+          }catch(err){ setError(err.message||'שגיאה בטעינת הנתונים'); }
         })();
-      }, []);
+      },[]);
 
-      const [query,setQuery]=useState('');
-      const [maxPrice,setMaxPrice]=useState(230000);
-      const [gearbox,setGearbox]=useState('הכל');
-      const [feat,setFeat]=useState({cruise:false,rearCamera:false,keyless:false,laneAssist:false,aeb:false});
-      const [compare,setCompare]=useState([]);
+      // חישוב גבולות דינאמי לפילטרים
+      const bounds = useMemo(()=>{
+        if(!cars.length) return {
+          price:[0,0], year:[2000,2030], engine:[0,5], hp:[0,400], trunk:[0,800]
+        };
+        const by = (sel) => cars.map(sel).filter(v=>v!==undefined && v!==null);
+        const minmax = (arr)=>[Math.min(...arr), Math.max(...arr)];
+        const [pMin,pMax] = minmax(by(c=>c.price));
+        const [yMin,yMax] = minmax(by(c=>c.year));
+        const [eMin,eMax] = minmax(by(c=>Number(c.engine)));
+        const [hpMin,hpMax] = minmax(by(c=>Number(c.specs?.powerHP||0)));
+        const [tMin,tMax] = minmax(by(c=>Number(c.specs?.trunk||0)));
+        return {
+          price:[pMin,pMax],
+          year:[yMin,yMax],
+          engine:[Math.floor(eMin*10)/10, Math.ceil(eMax*10)/10],
+          hp:[hpMin,hpMax],
+          trunk:[tMin,tMax]
+        };
+      },[cars]);
+
+      // לקבע ברירות מחדל אחרי טעינה
+      useEffect(()=>{
+        if(!ready || !cars.length) return;
+        setMaxPrice(bounds.price[1]);
+        setYearMin(bounds.year[0]);
+        setYearMax(bounds.year[1]);
+        setEngineMin(bounds.engine[0]);
+        setPowerMin(bounds.hp[0]);
+        setTrunkMin(bounds.trunk[0]);
+      },[ready]); // intentionally only after ready
+
+      // תיקון חיתוך שנים
+      useEffect(()=>{
+        if(yearMin>yearMax) setYearMin(yearMax);
+      },[yearMin,yearMax]);
 
       const gearboxes = useMemo(()=>['הכל', ...Array.from(new Set(cars.map(c=>c.gearbox)))], [cars]);
 
-      const filtered = useMemo(()=>cars.filter(c=>
-        c.price<=maxPrice &&
-        (gearbox==='הכל' || c.gearbox===gearbox) &&
-        (query.trim()==='' || (c.make+' '+c.model+' '+(c.trim||'')).includes(query.trim())) &&
-        (!feat.cruise || c.features.cruise) &&
-        (!feat.rearCamera || c.features.rearCamera) &&
-        (!feat.keyless || c.features.keyless) &&
-        (!feat.laneAssist || c.features.laneAssist) &&
-        (!feat.aeb || c.features.aeb)
-      ),[cars,maxPrice,gearbox,feat,query]);
+      const filtered = useMemo(()=>cars.filter(c=>{
+        if(c.price > maxPrice) return false;
+        if(gearbox!=='הכל' && c.gearbox!==gearbox) return false;
+        if(query.trim() && !(c.make+' '+c.model+' '+(c.trim||'')).includes(query.trim())) return false;
+
+        // חדשים:
+        if(c.year < yearMin || c.year > yearMax) return false;
+        if(Number(c.engine) < engineMin) return false;
+        if(Number(c.specs?.powerHP||0) < powerMin) return false;
+        if(Number(c.specs?.trunk||0) < trunkMin) return false;
+
+        // איבזור
+        if(feat.cruise && !c.features.cruise) return false;
+        if(feat.rearCamera && !c.features.rearCamera) return false;
+        if(feat.keyless && !c.features.keyless) return false;
+        if(feat.laneAssist && !c.features.laneAssist) return false;
+        if(feat.aeb && !c.features.aeb) return false;
+
+        return true;
+      }),[cars,maxPrice,gearbox,feat,query,yearMin,yearMax,engineMin,powerMin,trunkMin]);
 
       function toggleCompare(id){
         setCompare(curr=>curr.includes(id)? curr.filter(x=>x!==id) : (curr.length<3?[...curr,id]:curr));
       }
       const selected = cars.filter(c=>compare.includes(c.id));
+
+      const Stat = ({label,value})=>e('div',{className:'text-xs opacity-70'}, e('span',{className:'font-medium opacity-90'},label+': '), value);
 
       return e('div',{className:'min-h-screen'},
         e('header',{className:'sticky top-0 z-10 bg-white/80 backdrop-blur border-b'},
@@ -100,19 +161,41 @@
 
           // פילטרים
           e('aside',{className:'lg:col-span-4 xl:col-span-3'},
-            e('div',{className:'bg-white rounded-2xl shadow p-4'},
-              e('div',{className:'mb-3'},
+            e('div',{className:'bg-white rounded-2xl shadow p-4 space-y-4'},
+              // חיפוש
+              e('div',null,
                 e('label',{className:'text-sm font-medium'},'חיפוש דגם'),
                 e('input',{value:query,onChange:(ev)=>setQuery(ev.target.value),placeholder:'לדוגמה: אוקטביה',className:'mt-1 w-full rounded-xl border px-3 py-2 focus:outline-none focus:ring'})
               ),
-              e(Range,{label:'מחיר מקסימלי',min:120000,max:230000,step:1000,value:maxPrice,onChange:setMaxPrice,format:(v)=>v.toLocaleString()+' ₪'}),
-              e('div',{className:'mb-3'},
+
+              // מחיר
+              e(Range,{label:'מחיר מקסימלי',min:bounds.price[0]||0,max:bounds.price[1]||0,step:1000,value:maxPrice,onChange:setMaxPrice,format:(v)=>v.toLocaleString()+' ₪'}),
+
+              // שנה (מינ/מקס)
+              e('div',null,
+                e('div',{className:'flex items-center justify-between mb-1'},
+                  e('span',{className:'text-sm font-medium'},'שנתון'),
+                  e('span',{className:'text-sm opacity-70'}, `${yearMin}–${yearMax}`)
+                ),
+                e(Range,{label:'מינ׳',min:bounds.year[0]||2000,max:bounds.year[1]||2030,step:1,value:yearMin,onChange:setYearMin,format:(v)=>v}),
+                e(Range,{label:'מקס׳',min:bounds.year[0]||2000,max:bounds.year[1]||2030,step:1,value:yearMax,onChange:setYearMax,format:(v)=>v})
+              ),
+
+              // מנוע/כ"ס/תא מטען
+              e(Range,{label:'נפח מנוע מינ׳ (ל׳)',min:bounds.engine[0]||0,max:bounds.engine[1]||5,step:0.1,value:engineMin,onChange:setEngineMin,format:(v)=>v.toFixed(1)}),
+              e(Range,{label:'כוח סוס מינ׳',min:bounds.hp[0]||0,max:bounds.hp[1]||400,step:5,value:powerMin,onChange:setPowerMin,format:(v)=>v}),
+              e(Range,{label:'תא מטען מינ׳ (ל׳)',min:bounds.trunk[0]||0,max:bounds.trunk[1]||800,step:10,value:trunkMin,onChange:setTrunkMin,format:(v)=>v}),
+
+              // תיבת הילוכים
+              e('div',null,
                 e('label',{className:'text-sm font-medium'},'תיבת הילוכים'),
                 e('select',{className:'mt-1 w-full rounded-xl border px-3 py-2',value:gearbox,onChange:(ev)=>setGearbox(ev.target.value)},
                   gearboxes.map(g=>e('option',{key:g,value:g},g))
                 )
               ),
-              e('div',{className:'mt-4'},
+
+              // איבזור
+              e('div',null,
                 e('span',{className:'text-sm font-medium'},'איבזור'),
                 e('div',{className:'mt-2 grid grid-cols-1 gap-2'},
                   [['cruise','בקרת שיוט'],['rearCamera','מצלמה אחורית'],['keyless','Keyless'],['laneAssist','שמירת נתיב'],['aeb','בלימה אוטונומית']]
@@ -121,6 +204,12 @@
                     label
                   ))
                 )
+              ),
+
+              // סטטוסים קטנים
+              e('div',{className:'grid grid-cols-2 gap-2 pt-2'},
+                e(Stat,{label:'דגמים נטענו',value: ready? cars.length : '...'}),
+                e(Stat,{label:'תוצאות מסוננות',value: ready? filtered.length : '...'})
               )
             ),
 
@@ -138,7 +227,9 @@
           // תוצאות
           e('section',{className:'lg:col-span-8 xl:col-span-9'},
             e('div',{className:'flex items-center justify-between mb-3'},
-              e('div',{className:'text-sm opacity-70'}, ready ? `נמצאו ${filtered.length} רכבים` : 'טוען נתונים...'),
+              e('div',{className:'text-sm opacity-70'},
+                error ? ('שגיאה: ' + error) : (ready ? `נמצאו ${filtered.length} רכבים` : 'טוען נתונים...')
+              ),
               selected.length>1 && e('a',{href:'#compare',className:'rounded-xl px-3 py-2 bg-black text-white text-sm'},'השווה עכשיו')
             ),
             e('div',{className:'grid sm:grid-cols-2 xl:grid-cols-3 gap-4'},
@@ -208,11 +299,11 @@
           )
         ),
 
-        e('footer',{className:'max-w-6xl mx-auto px-4 pb-8 pt-2 text-xs opacity-60'}, 'דמו בסיסי • נתוני הדגמה בלבד')
+        e('footer',{className:'max-w-6xl mx-auto px-4 pb-8 pt-2 text-xs opacity-60'}, 'דמו • פילטרים מתקדמים • נתוני הדגמה בלבד')
       );
     }
 
     ReactDOM.createRoot(document.getElementById('app')).render(React.createElement(App));
   </script>
 </body>
-</html> 
+</html>
