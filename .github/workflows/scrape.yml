@@ -1,0 +1,39 @@
+name: Scrape iCar to cars.json
+
+on:
+  workflow_dispatch: {}
+  schedule:
+    - cron: "0 6 * * *"   # כל יום ב-06:00 UTC (09:00 שעון ישראל בקיץ בערך)
+
+permissions:
+  contents: write
+
+jobs:
+  scrape:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Use Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install deps
+        run: npm ci || npm install
+
+      - name: Run scraper
+        run: npm run scrape
+
+      - name: Commit & push if changed
+        run: |
+          if [[ -n "$(git status --porcelain)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add cars.json
+            git commit -m "chore: update cars.json [skip ci]"
+            git push
+          else
+            echo "No changes."
+          fi
