@@ -3,369 +3,201 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>iFindCar · דמו</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" />
+  <title>iFindCar – חיפוש וסינון רכבים</title>
   <style>
-    body{background:#f7f7fb}
-    .chip{display:inline-flex;align-items:center;gap:.4rem;border:1px solid #e5e7eb;border-radius:999px;padding:.2rem .6rem;font-size:.75rem;background:#fff}
-    input[type=range]{accent-color:#111}
-    .sticky-cta{position:sticky;bottom:0}
+    :root{--bg:#0b0c10;--card:#15171d;--ink:#e9eef5;--muted:#a8b3c7;--accent:#5ab0ff}
+    *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
+    header{position:sticky;top:0;z-index:10;background:rgba(11,12,16,.9);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid #202430}
+    .wrap{max-width:1100px;margin:0 auto;padding:14px}
+    h1{margin:0 0 6px;font-size:20px}
+    .filters{display:grid;gap:10px;grid-template-columns:repeat(6,minmax(0,1fr))}
+    .filters>*{grid-column:span 6}
+    @media (min-width:700px){.filters .col-2{grid-column:span 2}.filters .col-3{grid-column:span 3}.filters .col-6{grid-column:span 6}}
+    input,select,button,textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #2a2f3a;background:#0f1218;color:var(--ink);outline:none}
+    input::placeholder{color:#7f8aa3}
+    button{background:var(--accent);color:#001629;font-weight:700;border:none;cursor:pointer}
+    button.ghost{background:#0f1218;color:var(--muted);border:1px solid #2a2f3a}
+    .chips{display:flex;flex-wrap:wrap;gap:6px}
+    .chip{padding:6px 10px;background:#0f1218;border:1px solid #2a2f3a;border-radius:999px;font-size:13px;display:inline-flex;gap:6px;align-items:center}
+    .chip button{all:unset;cursor:pointer;color:#93a0b6}
+    .results{padding:18px}
+    .grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
+    @media (min-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (min-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .card{background:var(--card);border:1px solid #222836;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+    .title{font-weight:700;font-size:16px}
+    .muted{color:var(--muted);font-size:13px}
+    .equip{display:flex;flex-wrap:wrap;gap:6px}
+    .equip span{background:#0f1218;border:1px solid #2a2f3a;border-radius:8px;padding:4px 8px;font-size:12px;color:#cfe1ff}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--muted);font-size:14px}
+    .pill{background:#0f1218;border:1px solid #2a2f3a;border-radius:999px;padding:6px 10px;font-size:12px}
+    a.src{color:#7cc2ff;text-decoration:none}
+    footer{color:#73809b;padding:18px;text-align:center}
   </style>
 </head>
-<body class="text-gray-900">
-  <div id="app" class="min-h-screen"></div>
+<body>
+  <header>
+    <div class="wrap">
+      <h1>iFindCar – חיפוש וסינון</h1>
+      <div class="filters">
+        <input id="q" class="col-3" placeholder="חיפוש חופשי (דגם/גרסה/מנוע/אבזור)" />
+        <input id="minPrice" class="col-1" type="number" inputmode="numeric" placeholder="מחיר מינ׳" />
+        <input id="maxPrice" class="col-1" type="number" inputmode="numeric" placeholder="מחיר מקס׳" />
+        <input id="equipInput" class="col-3" placeholder="הוסף איבזור לסינון (Enter)" />
+        <div id="equipChips" class="chips col-6" aria-live="polite"></div>
+        <select id="sort" class="col-2">
+          <option value="relevance">מיון: רלוונטיות</option>
+          <option value="priceAsc">מחיר ↑</option>
+          <option value="priceDesc">מחיר ↓</option>
+          <option value="title">שם דגם</option>
+        </select>
+        <div class="col-2" style="display:flex;gap:8px">
+          <button id="apply">סנן</button>
+          <button id="clear" class="ghost">ניקוי</button>
+        </div>
+        <div class="col-2 pill" id="meta">טוען…</div>
+      </div>
+    </div>
+  </header>
 
-  <!-- React (CDN) -->
-  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <section class="results wrap">
+    <div class="grid" id="grid"></div>
+  </section>
 
-  <!-- טעינת דאטה מ-cars.json עם פולבאקים -->
-  <script>
-    window.__CARS__ = [];
-    async function tryFetch(path){const r=await fetch(path,{cache:'no-store'});if(!r.ok)throw new Error(r.status);return r.json();}
-    async function loadCars(){
-      for(const p of ['cars.json','./cars.json','docs/cars.json','./docs/cars.json']){
-        try{window.__CARS__=await tryFetch(p);return;}catch(_){}
-      }
-      window.__CARS__=[];
-    }
-  </script>
+  <footer>
+    נטען מ-cars.json. הנתונים מדמו/סקרייפר לצורכי הדגמה.
+  </footer>
 
-  <script>
-    const e = React.createElement;
-    const { useEffect, useMemo, useState } = React;
+<script>
+const state = {
+  raw: [],
+  cars: [],
+  equipments: new Set(), // active filter tags
+};
 
-    const Badge = ({children}) => e('span',{className:'chip'},children);
-    const X = (props)=>e('svg',{...props,viewBox:'0 0 20 20',width:14,height:14,fill:'none',stroke:'currentColor','stroke-width':2},
-      e('path',{d:'M6 6l8 8M14 6l-8 8'}));
+const els = {
+  grid: document.getElementById('grid'),
+  q: document.getElementById('q'),
+  minPrice: document.getElementById('minPrice'),
+  maxPrice: document.getElementById('maxPrice'),
+  equipInput: document.getElementById('equipInput'),
+  equipChips: document.getElementById('equipChips'),
+  sort: document.getElementById('sort'),
+  meta: document.getElementById('meta'),
+  apply: document.getElementById('apply'),
+  clear: document.getElementById('clear'),
+};
 
-    function Range({label,min,max,step=1,value,onChange,format}){
-      return e('div',{className:'mb-4'},
-        e('div',{className:'flex items-center justify-between mb-1'},
-          e('span',{className:'text-sm font-medium'},label),
-          e('span',{className:'text-sm opacity-70'},format?format(value):value)
-        ),
-        e('input',{type:'range',min,max,step,value,onChange:(ev)=>onChange(Number(ev.target.value)),className:'w-full'}),
-        e('div',{className:'flex justify-between text-xs opacity-60 mt-1'},
-          e('span',null,format?format(min):min),
-          e('span',null,format?format(max):max)
-        ),
-      );
-    }
+// fetch cars.json (יחסי, מתאים ל-GitHub Pages תחת /ifindcar/)
+async function loadData(){
+  try{
+    const res = await fetch('./cars.json', {cache: 'no-store'});
+    const data = await res.json();
+    // תומך בשני מבנים: {cars:[...]} או מערך ישיר
+    state.raw = Array.isArray(data) ? data : (data.cars || []);
+    normalize();
+    render();
+  }catch(e){
+    els.meta.textContent = 'שגיאת טעינה: ' + e.message;
+  }
+}
 
-    // === עזר: סנכרון פילטרים ל-URL ===
-    function useUrlState(stateObj, setStateObj){
-      // טען מה-URL בעת פתיחה
-      useEffect(()=>{
-        const p=new URLSearchParams(location.search);
-        const next={};
-        for(const k of Object.keys(stateObj)){
-          if(!p.has(k)) continue;
-          const v=p.get(k);
-          next[k]=/^\d+(\.\d+)?$/.test(v)?Number(v):(v==='true'?true:(v==='false'?false:v));
-        }
-        if(Object.keys(next).length) setStateObj(s=>({...s,...next}));
-      },[]);
-      // עדכן URL כשיש שינוי
-      useEffect(()=>{
-        const p=new URLSearchParams();
-        Object.entries(stateObj).forEach(([k,v])=>{
-          if(v===undefined || v===null || v==='' ) return;
-          p.set(k,String(v));
-        });
-        history.replaceState(null,'',location.pathname+(p.toString()?`?${p}`:''));
-      },[JSON.stringify(stateObj)]);
-    }
+// הפיכת הרשומה לפורמט קבוע לתצוגה/סינון
+function normalize(){
+  state.cars = state.raw.map((c,i)=>{
+    const title = c.title || c.version || c.model || 'דגם לא ידוע';
+    const price = c.price_nis ?? c.price ?? null;
+    const equipment = Array.isArray(c.equipment) ? c.equipment : [];
+    const specs = c.specs || {};
+    const src = c.source || c.url || null;
+    return {id:i, title, price, equipment, specs, src, raw:c};
+  });
+}
 
-    function App(){
-      const [ready,setReady]=useState(false);
-      const [error,setError]=useState('');
-      const [cars,setCars]=useState([]);
+// החלת סינון ומיון
+function applyFilters(){
+  const q = els.q.value.trim().toLowerCase();
+  const minP = Number(els.minPrice.value || 0);
+  const maxP = Number(els.maxPrice.value || Infinity);
+  const equipNeedles = Array.from(state.equipments);
 
-      // פילטרים בסיס + חדשים
-      const [filters,setFilters]=useState({
-        q:'', maxPrice:230000, gearbox:'הכל',
-        yearMin:2000, yearMax:2030,
-        engineMin:0, powerMin:0, trunkMin:0,
-        cruise:false, rearCamera:false, keyless:false, laneAssist:false, aeb:false,
-        sort:'price-asc' // default
-      });
+  let list = state.cars.filter(c=>{
+    const inPrice = (c.price ?? Infinity) >= minP && (c.price ?? 0) <= maxP;
+    const text = [c.title, JSON.stringify(c.specs), (c.equipment||[]).join(' ')].join(' ').toLowerCase();
+    const inText = !q || text.includes(q);
+    const hasAllEquip = equipNeedles.every(needle =>
+      (c.equipment||[]).some(x => (x||'').toLowerCase().includes(needle.toLowerCase()))
+    );
+    return inPrice && inText && hasAllEquip;
+  });
 
-      // סנכרון ל-URL
-      useUrlState(filters,(fn)=>setFilters(fn));
+  // מיון
+  const sort = els.sort.value;
+  if(sort === 'priceAsc') list.sort((a,b)=>(a.price??Infinity)-(b.price??Infinity));
+  else if(sort === 'priceDesc') list.sort((a,b)=>(b.price??-Infinity)-(a.price??-Infinity));
+  else if(sort === 'title') list.sort((a,b)=>a.title.localeCompare(b.title,'he'));
 
-      const setF=(k,val)=>setFilters(s=>({...s,[k]:val}));
+  return list;
+}
 
-      // השוואה
-      const [compare,setCompare]=useState([]);
-      const toggleCompare=(id)=>setCompare(c=>c.includes(id)?c.filter(x=>x!==id):(c.length<3?[...c,id]:c));
-      const selected = cars.filter(c=>compare.includes(c.id));
+// ציור הכרטיסים
+function render(){
+  const list = applyFilters();
+  els.meta.textContent = `נמצאו ${list.length} דגמים (מתוך ${state.cars.length})`;
+  els.grid.innerHTML = list.map(cardHTML).join('') || `<div class="muted">לא נמצאו תוצאות בהתאם לסינון</div>`;
+}
 
-      // טעינת דאטה
-      useEffect(()=>{
-        (async()=>{
-          try{await loadCars();setCars(window.__CARS__||[]);setReady(true);}
-          catch(err){setError(err.message||'שגיאה בטעינת הנתונים')}
-        })();
-      },[]);
+function cardHTML(c){
+  const price = (c.price!=null) ? c.price.toLocaleString('he-IL') + ' ₪' : '—';
+  const equip = (c.equipment||[]).slice(0,8).map(e=>`<span>${escapeHtml(e)}</span>`).join('');
+  const src = c.src ? `<a class="src" href="${c.src}" target="_blank" rel="noopener">למקור</a>` : '';
+  return `
+    <article class="card">
+      <div class="title">${escapeHtml(c.title)}</div>
+      <div class="muted">מחיר: <b>${price}</b></div>
+      <div class="equip">${equip || '<span>—</span>'}</div>
+      <div class="toolbar">
+        <span class="muted">${Object.keys(c.specs||{}).length} מאפייני מפרט</span>
+        ${src}
+      </div>
+    </article>
+  `;
+}
 
-      // גבולות דינמיים
-      const bounds = useMemo(()=>{
-        if(!cars.length) return {price:[0,0],year:[2000,2030],engine:[0,5],hp:[0,400],trunk:[0,800]};
-        const by = sel => cars.map(sel).filter(v=>v!=null);
-        const mm = arr => [Math.min(...arr),Math.max(...arr)];
-        return {
-          price:mm(by(c=>c.price)),
-          year:mm(by(c=>c.year)),
-          engine:mm(by(c=>Number(c.engine))),
-          hp:mm(by(c=>Number(c.specs?.powerHP||0))),
-          trunk:mm(by(c=>Number(c.specs?.trunk||0)))
-        };
-      },[cars]);
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
 
-      useEffect(()=>{
-        if(!ready||!cars.length) return;
-        setFilters(s=>({
-          ...s,
-          maxPrice: bounds.price[1],
-          yearMin: bounds.year[0], yearMax: bounds.year[1],
-          engineMin: bounds.engine[0], powerMin: bounds.hp[0], trunkMin: bounds.trunk[0]
-        }));
-      },[ready]);
+// ניהול תגיות איבזור
+function addEquipTag(text){
+  const t = text.trim();
+  if(!t) return;
+  state.equipments.add(t);
+  els.equipInput.value='';
+  drawEquipChips();
+  render();
+}
+function removeEquipTag(t){
+  state.equipments.delete(t);
+  drawEquipChips();
+  render();
+}
+function drawEquipChips(){
+  els.equipChips.innerHTML = Array.from(state.equipments).map(t=>`
+    <span class="chip">${escapeHtml(t)} <button title="הסר" onclick="removeEquipTag('${escapeHtml(t)}')">✕</button></span>
+  `).join('');
+}
+window.removeEquipTag = removeEquipTag;
 
-      const gearboxes = useMemo(()=>['הכל',...Array.from(new Set(cars.map(c=>c.gearbox)))],[cars]);
+// אירועים
+els.apply.addEventListener('click', render);
+els.clear.addEventListener('click', ()=>{
+  els.q.value=''; els.minPrice.value=''; els.maxPrice.value='';
+  state.equipments.clear(); drawEquipChips(); els.sort.value='relevance'; render();
+});
+els.equipInput.addEventListener('keydown', (e)=>{
+  if(e.key==='Enter'){ e.preventDefault(); addEquipTag(els.equipInput.value) }
+});
 
-      // סינון
-      const filtered = useMemo(()=>{
-        const f=filters;
-        let list=cars.filter(c=>{
-          if(c.price>f.maxPrice) return false;
-          if(f.gearbox!=='הכל' && c.gearbox!==f.gearbox) return false;
-          if(f.q.trim() && !(c.make+' '+c.model+' '+(c.trim||'')).includes(f.q.trim())) return false;
-          if(c.year<f.yearMin || c.year>f.yearMax) return false;
-          if(Number(c.engine)<f.engineMin) return false;
-          if(Number(c.specs?.powerHP||0)<f.powerMin) return false;
-          if(Number(c.specs?.trunk||0)<f.trunkMin) return false;
-          if(f.cruise && !c.features.cruise) return false;
-          if(f.rearCamera && !c.features.rearCamera) return false;
-          if(f.keyless && !c.features.keyless) return false;
-          if(f.laneAssist && !c.features.laneAssist) return false;
-          if(f.aeb && !c.features.aeb) return false;
-          return true;
-        });
-        // מיון
-        const [key,dir]=f.sort.split('-'); // e.g. price-asc
-        const getVal = (c)=>{
-          if(key==='price') return c.price;
-          if(key==='year') return c.year;
-          if(key==='power') return Number(c.specs?.powerHP||0);
-          return 0;
-        };
-        list.sort((a,b)=> (getVal(a)-getVal(b))*(dir==='asc'?1:-1));
-        return list;
-      },[cars,filters]);
-
-      // chips של פילטרים פעילים
-      const activeChips = useMemo(()=>{
-        const chips=[];
-        const f=filters, b=bounds;
-        if(f.q) chips.push(['q',`חיפוש: ${f.q}`]);
-        if(f.maxPrice < (b.price[1]||f.maxPrice)) chips.push(['maxPrice',`מחיר ≤ ${f.maxPrice.toLocaleString()} ₪`]);
-        if(f.gearbox!=='הכל') chips.push(['gearbox',`תיבה: ${f.gearbox}`]);
-        if(f.yearMin>(b.year[0]||f.yearMin) || f.yearMax<(b.year[1]||f.yearMax)) chips.push(['year','שנתון '+f.yearMin+'–'+f.yearMax]);
-        if(f.engineMin>(b.engine[0]||0)) chips.push(['engineMin',`מנוע ≥ ${f.engineMin.toFixed(1)} ל׳`]);
-        if(f.powerMin>(b.hp[0]||0)) chips.push(['powerMin',`כ״ס ≥ ${f.powerMin}`]);
-        if(f.trunkMin>(b.trunk[0]||0)) chips.push(['trunkMin',`תא מטען ≥ ${f.trunkMin} ל׳`]);
-        [['cruise','שיוט'],['rearCamera','מצלמה'],['keyless','Keyless'],['laneAssist','שמירת נתיב'],['aeb','AEB']]
-          .forEach(([k,l])=>{ if(f[k]) chips.push([k,`אבזור: ${l}`]); });
-        return chips;
-      },[filters,bounds]);
-
-      const clearChip = (key)=>{
-        const resets = {
-          q:'', gearbox:'הכל',
-          cruise:false,rearCamera:false,keyless:false,laneAssist:false,aeb:false
-        };
-        setFilters(s=>{
-          if(key==='year'){ return {...s,yearMin:bounds.year[0],yearMax:bounds.year[1]}; }
-          return {...s,[key]: (key in resets? resets[key] : (key.endsWith('Min')?0:(key==='maxPrice'?bounds.price[1]:'')))};
-        });
-      };
-
-      return e('div',{className:'min-h-screen'},
-        e('header',{className:'sticky top-0 z-10 bg-white/80 backdrop-blur border-b'},
-          e('div',{className:'max-w-6xl mx-auto px-4 py-3 flex items-center justify-between'},
-            e('h1',{className:'text-xl sm:text-2xl font-bold'},'iFindCar · דמו'),
-            selected.length>0 && e(Badge,null,`להשוואה: ${selected.length}/3`)
-          )
-        ),
-
-        e('main',{className:'max-w-6xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6'},
-
-          // סייד־בר פילטרים
-          e('aside',{className:'lg:col-span-4 xl:col-span-3'},
-            e('div',{className:'bg-white rounded-2xl shadow p-4 space-y-4'},
-              e('div',null,
-                e('label',{className:'text-sm font-medium'},'חיפוש דגם'),
-                e('input',{value:filters.q,onChange:(ev)=>setF('q',ev.target.value),placeholder:'לדוגמה: אוקטביה',className:'mt-1 w-full rounded-xl border px-3 py-2 focus:outline-none focus:ring'})
-              ),
-              e(Range,{label:'מחיר מקסימלי',min:bounds.price[0]||0,max:bounds.price[1]||0,step:1000,value:filters.maxPrice,onChange:(v)=>setF('maxPrice',v),format:(v)=>v.toLocaleString()+' ₪'}),
-
-              e('div',null,
-                e('div',{className:'flex items-center justify-between mb-1'},
-                  e('span',{className:'text-sm font-medium'},'שנתון'),
-                  e('span',{className:'text-sm opacity-70'}, `${filters.yearMin}–${filters.yearMax}`)
-                ),
-                e(Range,{label:'מינ׳',min:bounds.year[0]||2000,max:bounds.year[1]||2030,step:1,value:filters.yearMin,onChange:(v)=>setF('yearMin',v),format:(v)=>v}),
-                e(Range,{label:'מקס׳',min:bounds.year[0]||2000,max:bounds.year[1]||2030,step:1,value:filters.yearMax,onChange:(v)=>setF('yearMax',v),format:(v)=>v})
-              ),
-
-              e(Range,{label:'נפח מנוע מינ׳ (ל׳)',min:bounds.engine[0]||0,max:bounds.engine[1]||5,step:0.1,value:filters.engineMin,onChange:(v)=>setF('engineMin',v),format:(v)=>v.toFixed(1)}),
-              e(Range,{label:'כוח סוס מינ׳',min:bounds.hp[0]||0,max:bounds.hp[1]||400,step:5,value:filters.powerMin,onChange:(v)=>setF('powerMin',v),format:(v)=>v}),
-              e(Range,{label:'תא מטען מינ׳ (ל׳)',min:bounds.trunk[0]||0,max:bounds.trunk[1]||800,step:10,value:filters.trunkMin,onChange:(v)=>setF('trunkMin',v),format:(v)=>v}),
-
-              e('div',null,
-                e('label',{className:'text-sm font-medium'},'תיבת הילוכים'),
-                e('select',{className:'mt-1 w-full rounded-xl border px-3 py-2',value:filters.gearbox,onChange:(ev)=>setF('gearbox',ev.target.value)},
-                  (gearboxes.length?gearboxes:['הכל']).map(g=>e('option',{key:g,value:g},g))
-                )
-              ),
-
-              e('div',null,
-                e('span',{className:'text-sm font-medium'},'איבזור'),
-                e('div',{className:'mt-2 grid grid-cols-1 gap-2'},
-                  [['cruise','בקרת שיוט'],['rearCamera','מצלמה אחורית'],['keyless','Keyless'],['laneAssist','שמירת נתיב'],['aeb','בלימה אוטונומית']]
-                    .map(([k,l])=>e('label',{key:k,className:'flex items-center gap-2 text-sm'},
-                      e('input',{type:'checkbox',checked:filters[k],onChange:(ev)=>setF(k,ev.target.checked)}), l
-                    ))
-                )
-              )
-            ),
-
-            selected.length>0 && e('div',{className:'mt-4 bg-white rounded-2xl shadow p-4'},
-              e('h3',{className:'font-semibold mb-2'},'השוואה מהירה'),
-              e('ul',{className:'text-sm space-y-1'},
-                selected.map(c=>e('li',{key:c.id,className:'flex items-center justify-between'},
-                  e('span',null,`${c.make} ${c.model}`),
-                  e('button',{className:'text-xs underline opacity-70',onClick:()=>toggleCompare(c.id)},'הסר')
-                ))
-              )
-            )
-          ),
-
-          // תוצאות
-          e('section',{className:'lg:col-span-8 xl:col-span-9'},
-            // שורת כותרת: מספר תוצאות + מיון
-            e('div',{className:'flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3'},
-              e('div',{className:'text-sm opacity-70'},
-                error?('שגיאה: '+error):(ready?`נמצאו ${filtered.length} רכבים`:'טוען נתונים...')
-              ),
-              e('div',{className:'flex items-center gap-2'},
-                e('label',{className:'text-sm'},'מיון:'),
-                e('select',{className:'rounded-xl border px-3 py-2 text-sm',value:filters.sort,
-                  onChange:(ev)=>setF('sort',ev.target.value)},
-                  [
-                    ['price-asc','מחיר (מהזול ליקר)'],
-                    ['price-desc','מחיר (מהיקר לזול)'],
-                    ['year-desc','שנתון (חדש → ישן)'],
-                    ['year-asc','שנתון (ישן → חדש)'],
-                    ['power-desc','כ״ס (גבוה → נמוך)'],
-                    ['power-asc','כ״ס (נמוך → גבוה)'],
-                  ].map(([v,l])=>e('option',{key:v,value:v},l))
-                )
-              )
-            ),
-
-            // Chips של פילטרים פעילים
-            activeChips.length>0 && e('div',{className:'flex flex-wrap gap-2 mb-4'},
-              activeChips.map(([k,label])=>e('span',{key:k,className:'chip'},
-                label,
-                e('button',{className:'opacity-70',onClick:()=>clearChip(k)}, e(X,{}))
-              )),
-              e('button',{className:'chip',onClick:()=>location.href=location.pathname},'נקה הכל', e(X,{}))
-            ),
-
-            // גריד
-            e('div',{className:'grid sm:grid-cols-2 xl:grid-cols-3 gap-4'},
-              (ready?filtered:[]).map(c=>e('article',{key:c.id,className:'bg-white rounded-2xl shadow overflow-hidden flex flex-col'},
-                e('img',{src:c.image,alt:'car',className:'h-40 w-full object-cover',loading:'lazy'}),
-                e('div',{className:'p-4 flex-1 flex flex-col gap-2'},
-                  e('h3',{className:'font-semibold text-lg'},`${c.make} ${c.model} ${c.trim? '• '+c.trim:''}`),
-                  e('div',{className:'text-sm opacity-70'},`${c.year||'—'} • ${c.gearbox||'—'} • ${c.engine||'—'} ל׳`),
-                  e('div',{className:'text-base font-bold'}, (c.price||0).toLocaleString() + ' ₪'),
-                  e('div',{className:'flex flex-wrap gap-1 mt-1'},
-                    c.features?.cruise && e(Badge,null,'שיוט'),
-                    c.features?.rearCamera && e(Badge,null,'מצלמה'),
-                    c.features?.keyless && e(Badge,null,'Keyless'),
-                    c.features?.laneAssist && e(Badge,null,'שמירת נתיב'),
-                    c.features?.aeb && e(Badge,null,'AEB'),
-                  ),
-                  e('div',{className:'mt-auto flex items-center justify-between pt-2'},
-                    e('a',{href:'#compare',onClick:(ev)=>{ev.preventDefault();toggleCompare(c.id);},className:`text-sm underline ${compare.includes(c.id)?'opacity-100':'opacity-70'}`},
-                      compare.includes(c.id)?'ברשימת השוואה':'הוסף להשוואה'
-                    ),
-                    e('span',{className:'text-xs opacity-60'}, `תא מטען ${c.specs?.trunk||'—'} ל׳`)
-                  )
-                )
-              ))
-            ),
-
-            // טבלת השוואה
-            selected.length>1 && e('div',{id:'compare',className:'mt-8 bg-white rounded-2xl shadow p-4'},
-              e('h3',{className:'font-semibold text-lg mb-3'},'טבלת השוואה'),
-              e('div',{className:'overflow-auto'},
-                e('table',{className:'min-w-full text-sm'},
-                  e('thead',null,
-                    e('tr',{className:'text-left'},
-                      e('th',{className:'p-2'},'מאפיין'),
-                      selected.map(c=>e('th',{key:c.id,className:'p-2 whitespace-nowrap'}, `${c.make} ${c.model}`))
-                    )
-                  ),
-                  e('tbody',null,
-                    [
-                      ['price','מחיר', v=>v.toLocaleString()+' ₪', c=>c.price],
-                      ['gearbox','תיבה', null, c=>c.gearbox],
-                      ['engine','נפח מנוע (ל׳)', null, c=>c.engine],
-                      ['length','אורך (מ״מ)', null, c=>c.specs?.length],
-                      ['width','רוחב (מ״מ)', null, c=>c.specs?.width],
-                      ['height','גובה (מ״מ)', null, c=>c.specs?.height],
-                      ['wheelbase','בסיס גלגלים (מ״מ)', null, c=>c.specs?.wheelbase],
-                      ['trunk','תא מטען (ל׳)', null, c=>c.specs?.trunk],
-                      ['powerHP','כ״ס', null, c=>c.specs?.powerHP],
-                      ['features.cruise','בקרת שיוט', v=>v?'✔':'✖', c=>c.features?.cruise],
-                      ['features.rearCamera','מצלמה אחורית', v=>v?'✔':'✖', c=>c.features?.rearCamera],
-                      ['features.keyless','Keyless', v=>v?'✔':'✖', c=>c.features?.keyless],
-                      ['features.laneAssist','שמירת נתיב', v=>v?'✔':'✖', c=>c.features?.laneAssist],
-                      ['features.aeb','בלימה אוטונומית', v=>v?'✔':'✖', c=>c.features?.aeb],
-                    ].map(([key,label,fmt,get])=>
-                      e('tr',{key,className:'border-t'},
-                        e('td',{className:'p-2 font-medium whitespace-nowrap'},label),
-                        selected.map(c=>{
-                          const val=get(c); const disp=fmt?fmt(val): (val??'—');
-                          return e('td',{key:c.id+key,className:'p-2 whitespace-nowrap'},disp);
-                        })
-                      )
-                    )
-                  )
-                )
-              )
-            )
-          )
-        ),
-
-        // בר תחתון במובייל להשוואה
-        e('div',{className:'sticky-cta bg-white/90 border-t md:hidden'},
-          e('div',{className:'max-w-6xl mx-auto px-4 py-3 flex items-center justify-between'},
-            e('div',{className:'text-sm'}, `מסומנים להשוואה: ${selected.length}/3`),
-            e('a',{href:'#compare',className:'rounded-xl px-3 py-2 bg-black text-white text-sm'}, 'פתח השוואה')
-          )
-        ),
-
-        e('footer',{className:'max-w-6xl mx-auto px-4 pb-8 pt-2 text-xs opacity-60'}, 'דמו • פילטרים ומיון • נתוני הדגמה בלבד')
-      );
-    }
-
-    ReactDOM.createRoot(document.getElementById('app')).render(React.createElement(App));
-  </script>
+loadData();
+</script>
 </body>
 </html>
