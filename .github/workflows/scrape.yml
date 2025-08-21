@@ -1,8 +1,16 @@
 name: Scrape iCar to cars.json
+
 on:
   workflow_dispatch:
+
 jobs:
-  step1:
+  step2:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "STEP 1 OK"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: List repo files
+        run: |
+          pwd
+          ls -la
