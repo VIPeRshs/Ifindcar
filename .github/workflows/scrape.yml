@@ -4,13 +4,19 @@ on:
   workflow_dispatch:
 
 jobs:
-  step2:
+  step3:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: List repo files
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Verify Python
         run: |
-          pwd
-          ls -la
+          python --version
+          echo "print('Hello from Python')" > test.py
+          python test.py
