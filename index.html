@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>iFindCar – חיפוש וסינון רכבים</title>
   <style>
-    :root{--bg:#0b0c10;--card:#15171d;--ink:#e9eef5;--muted:#a8b3c7;--accent:#5ab0ff}
+    :root{--bg:#0b0c10;--card:#15171d;--ink:#e9eef5;--muted:#a8b3c7;--accent:#5ab0ff;--line:#222836}
     *{box-sizing:border-box}
     body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
     header{position:sticky;top:0;z-index:10;background:rgba(11,12,16,.9);backdrop-filter:saturate(140%) blur(8px);border-bottom:1px solid #202430}
@@ -13,25 +13,32 @@
     h1{margin:0 0 6px;font-size:20px}
     .filters{display:grid;gap:10px;grid-template-columns:repeat(6,minmax(0,1fr))}
     .filters>*{grid-column:span 6}
-    @media (min-width:700px){.filters .col-2{grid-column:span 2}.filters .col-3{grid-column:span 3}.filters .col-6{grid-column:span 6}}
-    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid #2a2f3a;background:#0f1218;color:var(--ink);outline:none}
+    @media (min-width:780px){
+      .filters .col-2{grid-column:span 2}
+      .filters .col-3{grid-column:span 3}
+    }
+    input,select,button{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--line);background:#0f1218;color:var(--ink);outline:none}
     input::placeholder{color:#7f8aa3}
+    .checkset{display:flex;flex-wrap:wrap;gap:10px}
+    .check{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1px solid var(--line);background:#0f1218;border-radius:999px;font-size:13px}
     button{background:var(--accent);color:#001629;font-weight:700;border:none;cursor:pointer}
-    button.ghost{background:#0f1218;color:var(--muted);border:1px solid #2a2f3a}
-    .chips{display:flex;flex-wrap:wrap;gap:6px}
-    .chip{padding:6px 10px;background:#0f1218;border:1px solid #2a2f3a;border-radius:999px;font-size:13px;display:inline-flex;gap:6px;align-items:center}
-    .chip button{all:unset;cursor:pointer;color:#93a0b6}
+    button.ghost{background:#0f1218;color:var(--muted);border:1px solid var(--line)}
+    .pill{background:#0f1218;border:1px solid var(--line);border-radius:999px;padding:6px 10px;font-size:12px;color:#9fb0cc}
     .results{padding:18px}
     .grid{display:grid;gap:14px;grid-template-columns:repeat(1,minmax(0,1fr))}
-    @media (min-width:700px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-    @media (min-width:1000px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
-    .card{background:var(--card);border:1px solid #222836;border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
-    .title{font-weight:700;font-size:16px}
+    @media (min-width:800px){.grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media (min-width:1120px){.grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+    .pic{aspect-ratio:16/9;background:#0f1218;display:flex;align-items:center;justify-content:center}
+    .pic img{width:100%;height:100%;object-fit:cover}
+    .body{padding:14px;display:flex;flex-direction:column;gap:8px}
+    .title{font-weight:800;font-size:16px}
     .muted{color:var(--muted);font-size:13px}
-    .equip{display:flex;flex-wrap:wrap;gap:6px}
-    .equip span{background:#0f1218;border:1px solid #2a2f3a;border-radius:8px;padding:4px 8px;font-size:12px;color:#cfe1ff}
-    .toolbar{display:flex;justify-content:space-between;align-items:center;margin-top:8px;color:var(--muted);font-size:14px}
-    .pill{background:#0f1218;border:1px solid #2a2f3a;border-radius:999px;padding:6px 10px;font-size:12px}
+    .row{display:flex;flex-wrap:wrap;gap:10px}
+    .tag{background:#0f1218;border:1px solid var(--line);border-radius:8px;padding:4px 8px;font-size:12px;color:#cfe1ff}
+    .specs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+    .spec{background:#0f1218;border:1px solid var(--line);border-radius:8px;padding:6px 8px;font-size:12px}
+    .toolbar{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;color:#8ea0bd;border-top:1px solid var(--line);font-size:13px}
     a.src{color:#7cc2ff;text-decoration:none}
     footer{color:#73809b;padding:18px;text-align:center}
   </style>
@@ -40,18 +47,22 @@
   <header>
     <div class="wrap">
       <h1>iFindCar – חיפוש וסינון</h1>
+
       <div class="filters">
-        <input id="q" class="col-3" placeholder="חיפוש חופשי (דגם/גרסה/מנוע/אבזור)" />
+        <input id="q" class="col-3" placeholder="חיפוש חופשי (יצרן/דגם/גיר/מנוע/מפרט)" />
         <input id="minPrice" class="col-1" type="number" inputmode="numeric" placeholder="מחיר מינ׳" />
         <input id="maxPrice" class="col-1" type="number" inputmode="numeric" placeholder="מחיר מקס׳" />
-        <input id="equipInput" class="col-3" placeholder="הוסף איבזור לסינון (Enter)" />
-        <div id="equipChips" class="chips col-6" aria-live="polite"></div>
-        <select id="sort" class="col-2">
+        <select id="sort" class="col-1">
           <option value="relevance">מיון: רלוונטיות</option>
           <option value="priceAsc">מחיר ↑</option>
           <option value="priceDesc">מחיר ↓</option>
           <option value="title">שם דגם</option>
         </select>
+
+        <div class="checkset col-6" id="featureChecks">
+          <!-- ימולא דינמית מתוך המפתח features -->
+        </div>
+
         <div class="col-2" style="display:flex;gap:8px">
           <button id="apply">סנן</button>
           <button id="clear" class="ghost">ניקוי</button>
@@ -66,62 +77,112 @@
   </section>
 
   <footer>
-    נטען מ-cars.json. נתוני הדגמה מסקרייפר.
+    נתונים נטענים מתוך <code>cars.json</code>. הדגמה.
   </footer>
 
 <script>
-const state = { raw: [], cars: [], equipments: new Set(), updated: null };
-
 const els = {
   grid: document.getElementById('grid'),
   q: document.getElementById('q'),
   minPrice: document.getElementById('minPrice'),
   maxPrice: document.getElementById('maxPrice'),
-  equipInput: document.getElementById('equipInput'),
-  equipChips: document.getElementById('equipChips'),
   sort: document.getElementById('sort'),
   meta: document.getElementById('meta'),
   apply: document.getElementById('apply'),
   clear: document.getElementById('clear'),
+  featureChecks: document.getElementById('featureChecks'),
 };
 
-async function loadData(){
-  try{
-    const res = await fetch('./cars.json', {cache:'no-store'});
-    const data = await res.json();
-    state.updated = data.updated || null;
-    state.raw = Array.isArray(data) ? data : (data.cars || data.results || []);
-    normalize();
-    render();
-  }catch(e){
-    els.meta.textContent = 'שגיאת טעינה: ' + e.message;
-  }
-}
+const state = {
+  raw: [],
+  cars: [],
+  // features שהמשתמש סימן (true=חובה)
+  featureFilter: {},
+  lastScraped: null,
+};
 
-const getFirst = (obj, keys) => { for (const k of keys) if (obj && obj[k] != null) return obj[k]; };
-const toNumber = v => {
+const FEATURE_LABELS = {
+  cruise: 'בקרת שיוט',
+  rearCamera: 'מצלמת רוורס',
+  keyless: 'כניסה/הנעה ללא מפתח',
+  laneAssist: 'שמירת נתיב',
+  aeb: 'בלימה אוטונומית',
+};
+
+function escapeHtml(s){return String(s ?? '').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
+const toNum = v => {
   if (v == null) return null;
   if (typeof v === 'number') return v;
   const s = String(v).replace(/[^\d.,]/g,'').replace(/,/g,'');
   const n = Number(s);
   return Number.isFinite(n) ? n : null;
 };
+
+// טוען את המידע
+async function loadData(){
+  const res = await fetch('./cars.json', {cache:'no-store'});
+  const data = await res.json();
+  state.raw = Array.isArray(data) ? data : (data.cars || []);
+  // קח timestamp אחרון שקיים ברשומות (scrapedAt)
+  state.lastScraped = getLastScraped(state.raw);
+  normalize();
+  buildFeatureFilters();
+  render();
+}
+
+function getLastScraped(arr){
+  let t = 0;
+  for (const r of arr){
+    const d = Date.parse(r.scrapedAt || r.updated || '');
+    if (!Number.isNaN(d)) t = Math.max(t, d);
+  }
+  return t || null;
+}
+
+// ממפה ישירות לשדות שלך
 function normalize(){
-  state.cars = state.raw.map((c,i)=>{
-    const title = getFirst(c, ['title','version','model','name','דגם','כותרת']) || `דגם #${i+1}`;
-    const price = toNumber(getFirst(c, ['price_nis','price','מחיר','מחיר_ש״ח','מחיר_שח']));
-    let equipment = getFirst(c, ['equipment','אבזור']);
-    if (!Array.isArray(equipment)) equipment = [];
-    let specs = getFirst(c, ['specs','מפרט','spec','details']);
-    if (!specs || typeof specs !== 'object') specs = {};
-    if (Object.keys(specs).length === 0) {
-      const skip = new Set(['title','version','model','name','דגם','כותרת','price_nis','price','מחיר','equipment','אבזור','source','url']);
-      for (const k of Object.keys(c||{})) {
-        if (!skip.has(k) && typeof c[k] !== 'object') specs[k] = c[k];
-      }
+  state.cars = state.raw.map((r,i)=>{
+    const title = [r.make, r.model, r.trim].filter(Boolean).join(' ').trim() || `דגם #${i+1}`;
+    const price = toNum(r.price);
+    const gearbox = r.gearbox ?? null;
+    const engine = r.engine ?? null;    // אצלך זה מספר (יתכן שנה/נפח), נציג כפי שהוא
+    const year = r.year ?? null;
+    const image = r.image ?? null;
+    const src = r.source ?? r.url ?? null;
+
+    // features: אובייקט בוליאני -> רשימת תגים אמתיים
+    const featuresObj = typeof r.features === 'object' && r.features ? r.features : {};
+    const featureTags = Object.keys(featuresObj).filter(k => !!featuresObj[k]);
+
+    // specs: הצג רק ערכים שאינם null/"" 
+    const specsObj = typeof r.specs === 'object' && r.specs ? r.specs : {};
+    const specs = {};
+    for (const [k,v] of Object.entries(specsObj)){
+      if (v !== null && v !== '') specs[k] = v;
     }
-    const src = getFirst(c, ['source','url','link','קישור']);
-    return { id:i, title, price, equipment, specs, src, raw:c };
+
+    return { id:i, title, price, gearbox, engine, year, image, src, featuresObj, featureTags, specs, raw:r };
+  });
+}
+
+// יוצר תיבות סימון לפי כל המפתחות שמופיעים בפועל ב-features
+function buildFeatureFilters(){
+  const keys = new Set();
+  for (const c of state.cars){
+    for (const k of Object.keys(c.featuresObj || {})) keys.add(k);
+  }
+  const ordered = Array.from(keys);
+  els.featureChecks.innerHTML = ordered.map(k=>{
+    const label = FEATURE_LABELS[k] || k;
+    const id = 'feat-' + k;
+    return `<label class="check"><input type="checkbox" id="${id}" data-key="${escapeHtml(k)}"> ${escapeHtml(label)}</label>`;
+  }).join('');
+  // האזן לשינויים
+  els.featureChecks.addEventListener('change', (e)=>{
+    const key = e.target?.dataset?.key;
+    if (!key) return;
+    state.featureFilter[key] = e.target.checked;
+    render();
   });
 }
 
@@ -129,16 +190,23 @@ function applyFilters(){
   const q = els.q.value.trim().toLowerCase();
   const minP = Number(els.minPrice.value || 0);
   const maxP = Number(els.maxPrice.value || Infinity);
-  const needles = Array.from(state.equipments);
+
+  const requiredFeatures = Object.entries(state.featureFilter)
+    .filter(([,v])=>v).map(([k])=>k);
 
   let list = state.cars.filter(c=>{
     const inPrice = (c.price ?? Infinity) >= minP && (c.price ?? 0) <= maxP;
-    const text = [c.title, JSON.stringify(c.specs), (c.equipment||[]).join(' ')].join(' ').toLowerCase();
+
+    const text = [
+      c.title, c.gearbox, c.engine, c.year,
+      (c.featureTags||[]).join(' '),
+      JSON.stringify(c.specs||{})
+    ].join(' ').toLowerCase();
     const inText = !q || text.includes(q);
-    const hasAllEquip = needles.every(n =>
-      (c.equipment||[]).some(x => (x||'').toLowerCase().includes(n.toLowerCase()))
-    );
-    return inPrice && inText && hasAllEquip;
+
+    const hasAllFeats = requiredFeatures.every(k => c.featuresObj && !!c.featuresObj[k]);
+
+    return inPrice && inText && hasAllFeats;
   });
 
   const sort = els.sort.value;
@@ -151,44 +219,56 @@ function applyFilters(){
 
 function render(){
   const list = applyFilters();
-  const upd = state.updated ? ` • עודכן: ${new Date(state.updated).toLocaleString('he-IL')}` : '';
+  const upd = state.lastScraped ? ` • עודכן: ${new Date(state.lastScraped).toLocaleString('he-IL')}` : '';
   els.meta.textContent = `נמצאו ${list.length} דגמים (מתוך ${state.cars.length})${upd}`;
   els.grid.innerHTML = list.map(cardHTML).join('') || `<div class="muted">לא נמצאו תוצאות</div>`;
 }
 
 function cardHTML(c){
   const price = (c.price!=null) ? c.price.toLocaleString('he-IL') + ' ₪' : '—';
-  const equip = (c.equipment||[]).slice(0,10).map(e=>`<span>${escapeHtml(e)}</span>`).join('') || '<span>—</span>';
+  const feats = (c.featureTags||[]).map(k=>`<span class="tag">${escapeHtml(FEATURE_LABELS[k]||k)}</span>`).join('') || '<span class="muted">ללא נתוני איבזור</span>';
+
+  // נציג עד 6 שורות מפרט שאינן null
   const specPairs = Object.entries(c.specs||{}).slice(0,6).map(([k,v])=>`
-      <div><span class="muted">${escapeHtml(k)}:</span> ${escapeHtml(v)}</div>
-  ).join('') || '<div class="muted">—</div>';
+    <div class="spec"><b>${escapeHtml(k)}:</b> ${escapeHtml(v)}</div>
+  `).join('') || '<div class="muted">—</div>';
+
+  const gearbox = c.gearbox ? `<span class="tag">גיר: ${escapeHtml(c.gearbox)}</span>` : '';
+  const engine = (c.engine!=null && c.engine!=='') ? `<span class="tag">מנוע/שנה: ${escapeHtml(c.engine)}</span>` : '';
+  const year = (c.year!=null && c.year!=='') ? `<span class="tag">שנה: ${escapeHtml(c.year)}</span>` : '';
+
   const src = c.src ? `<a class="src" href="${c.src}" target="_blank" rel="noopener">למקור</a>` : '';
+
   return `
     <article class="card">
-      <div class="title">${escapeHtml(c.title)}</div>
-      <div class="muted">מחיר: <b>${price}</b></div>
-      <div class="equip">${equip}</div>
-      <div class="muted">מפרט:</div>
-      <div>${specPairs}</div>
+      <div class="pic">${c.image ? `<img src="${escapeHtml(c.image)}" alt="${escapeHtml(c.title)}">` : '<span class="muted">אין תמונה</span>'}</div>
+      <div class="body">
+        <div class="title">${escapeHtml(c.title)}</div>
+        <div class="row">
+          <span class="tag">מחיר: ${price}</span>
+          ${gearbox}${engine}${year}
+        </div>
+        <div class="muted">איבזור זמין:</div>
+        <div class="row">${feats}</div>
+        <div class="muted">מפרט:</div>
+        <div class="specs">${specPairs}</div>
+      </div>
       <div class="toolbar">
-        <span class="muted">${Object.keys(c.specs||{}).length} מאפייני מפרט</span>
+        <span>${Object.keys(c.specs||{}).length} ערכי מפרט</span>
         ${src}
       </div>
     </article>
   `;
 }
 
-function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]))}
-
-const drawEquipChips = ()=> els.equipChips.innerHTML = Array.from(state.equipments).map(t=>`
-  <span class="chip">${escapeHtml(t)} <button type="button" data-tag="${escapeHtml(t)}">✕</button></span>
-`).join('');
-function addEquipTag(t){ t=t.trim(); if(!t) return; state.equipments.add(t); els.equipInput.value=''; drawEquipChips(); render(); }
-els.equipChips.addEventListener('click',e=>{ const t=e.target?.dataset?.tag; if(t){ state.equipments.delete(t); drawEquipChips(); render(); }});
-
+// אירועים
 els.apply.addEventListener('click', render);
-els.clear.addEventListener('click', ()=>{ els.q.value=''; els.minPrice.value=''; els.maxPrice.value=''; state.equipments.clear(); drawEquipChips(); els.sort.value='relevance'; render(); });
-els.equipInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); addEquipTag(els.equipInput.value) } });
+els.clear.addEventListener('click', ()=>{
+  els.q.value=''; els.minPrice.value=''; els.maxPrice.value=''; els.sort.value='relevance';
+  for (const cb of els.featureChecks.querySelectorAll('input[type=checkbox]')) cb.checked = false;
+  state.featureFilter = {};
+  render();
+});
 
 loadData();
 </script>
