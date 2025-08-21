@@ -1,38 +1,44 @@
 name: Scrape iCar to cars.json
+
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"
 
 permissions:
   contents: write
 
 jobs:
-  update-cars:
+  run-scraper:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Create cars.json (smoke)
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
         run: |
-          python - << 'PY'
-          import json, datetime, pathlib
-          data = {
-            "smoke": True,
-            "updated": datetime.datetime.utcnow().isoformat()+"Z",
-            "cars": ["Mazda 3", "Toyota Corolla"]
-          }
-          pathlib.Path("cars.json").write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
-          print("cars.json written")
-          PY
-          echo "----- cars.json -----"
-          cat cars.json
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
 
-      - name: Git status
-        run: git status --porcelain
+      - name: Run scraper
+        run: |
+          node scraper.js
+          echo "----- cars.json (first lines) -----"
+          head -n 40 cars.json || true
 
-      - name: Commit & push
+      - name: Commit & push cars.json
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add cars.json
-          git commit -m "smoke: update cars.json [skip ci]" || echo "No changes to commit"
+          git commit -m "update cars.json [skip ci]" || echo "No changes"
           git push
