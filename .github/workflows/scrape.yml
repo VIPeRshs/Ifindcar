@@ -1,34 +1,14 @@
-name: Scrape iCar to cars.json
+name: Scraper test
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "0 0 * * *"
-
-permissions:
-  contents: write
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
-      - name: Write smoke test cars.json
-        run: |
-          node -e "require('fs').writeFileSync('cars.json', JSON.stringify({ smoke:true, updated:new Date().toISOString() }, null, 2))"
-          ls -la
-          echo "----- cars.json -----"
-          cat cars.json
-
-      - name: Git status (before commit)
-        run: git status --porcelain
-
-      - name: Commit and Push result
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add cars.json
-          git commit -m "smoke: update cars.json [skip ci]" || echo "No changes to commit"
-          git push
+      - name: Run echo
+        run: echo "Scraper workflow detected"
