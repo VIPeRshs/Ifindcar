@@ -1,5 +1,4 @@
 name: Scrape iCar to cars.json
-
 on:
   workflow_dispatch:
 
@@ -7,13 +6,12 @@ permissions:
   contents: write
 
 jobs:
-  step3:
+  update-cars:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Create cars.json (smoke test)
+      - name: Create cars.json (smoke)
         run: |
           python - << 'PY'
           import json, datetime, pathlib
@@ -28,10 +26,10 @@ jobs:
           echo "----- cars.json -----"
           cat cars.json
 
-      - name: Git status (should show A/M cars.json)
+      - name: Git status
         run: git status --porcelain
 
-      - name: Commit & push cars.json
+      - name: Commit & push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
