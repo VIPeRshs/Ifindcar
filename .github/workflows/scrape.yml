@@ -3,7 +3,7 @@ name: Scrape iCar to cars.json
 on:
   workflow_dispatch: {}
   schedule:
-    - cron: "0 6 * * *" # כל יום 06:00 UTC (בסביבות 09:00 בישראל בקיץ)
+    - cron: "0 6 * * *" # 06:00 UTC יומי
 
 permissions:
   contents: write
@@ -21,10 +21,15 @@ jobs:
           node-version: "20"
 
       - name: Install deps
-        run: npm ci || npm install
+        run: |
+          npm install
 
       - name: Run scraper
-        run: npm run scrape
+        run: |
+          set -e
+          node -v
+          npm -v
+          npm run scrape
 
       - name: Commit & push if changed
         run: |
