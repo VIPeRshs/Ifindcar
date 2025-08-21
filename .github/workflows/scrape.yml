@@ -1,38 +1,33 @@
 name: Scrape iCar to cars.json
 
 on:
-  workflow_dispatch: {}
+  workflow_dispatch: # מאפשר להריץ ידנית מה-Actions
   schedule:
-    - cron: "0 6 * * *" # ירוץ כל יום ב־09:00 שעון ישראל
-
-permissions:
-  contents: write
+    - cron: "0 0 * * *" # ירוץ פעם ביום בחצות
 
 jobs:
-  scrape:
+  build:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout code
+      - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          node-version: 18
 
       - name: Install dependencies
-        run: npm install
+        run: npm install axios cheerio
 
       - name: Run scraper
-        run: |
-          node scraper.js
-          ls -l cars.json
-          cat cars.json
+        run: node scraper.js
 
-      - name: Commit and push cars.json
+      - name: Commit and Push results
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
           git add cars.json
-          git commit -m "Update cars.json [skip ci]" || echo "No changes to commit"
+          git commit -m "Update cars.json" || echo "No changes to commit"
           git push
