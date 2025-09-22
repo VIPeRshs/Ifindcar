@@ -1,259 +1,630 @@
-<!DOCTYPE html>
-<html lang="he">
+<!doctype html>
+<html lang="he" dir="rtl">
 <head>
-  <meta charset="UTF-8">
-  <title>iFindCar - חיפוש רכבים</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      direction: rtl;
-      margin: 0;
-      padding: 0;
-      background: #f7f7f7;
-    }
-    header {
-      background: #2c3e50;
-      color: white;
-      padding: 15px;
-      text-align: center;
-    }
-    .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
-    .hidden {
-      display: none;
-    }
-    .form-group {
-      margin-bottom: 15px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    select, input[type="number"] {
-      width: 100%;
-      padding: 8px;
-    }
-    .checkbox-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .checkbox-group label {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    button {
-      background: #2980b9;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      cursor: pointer;
-      border-radius: 5px;
-    }
-    button:hover {
-      background: #3498db;
-    }
-    .results {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 20px;
-    }
-    .car-card {
-      background: white;
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      padding: 15px;
-    }
-    .car-card img {
-      max-width: 100%;
-      border-radius: 5px;
-    }
-    .back-btn {
-      margin-bottom: 20px;
-      background: #27ae60;
-    }
-  </style>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>iFindCar — חיפוש, פרטים והשוואה</title>
+<style>
+:root{
+  --bg:#0b0c10;--card:#121418;--ink:#e9eef5;--muted:#95a6bd;--accent:#5ab0ff;--ok:#2ecc71;
+  --line:#222836;--danger:#e74c3c;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.container{max-width:1100px;margin:0 auto;padding:14px}
+.header{display:flex;align-items:center;gap:12px;justify-content:space-between;padding:10px 0}
+.brand{font-weight:800;font-size:18px}
+.smallmuted{color:var(--muted);font-size:13px}
+
+/* ---------- common layout ---------- */
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:14px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.col{flex:1;min-width:140px}
+.hidden{display:none}
+
+/* ---------- search form (first screen) ---------- */
+.title{font-size:20px;margin:6px 0 10px}
+.form-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+@media(max-width:720px){.form-grid{grid-template-columns:1fr}}
+label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+select,input[type=number]{width:100%;padding:9px;border-radius:8px;border:1px solid var(--line);background:#071018;color:var(--ink)}
+button{cursor:pointer;border:0;padding:10px 12px;border-radius:10px;background:var(--accent);color:#022033;font-weight:700}
+.btn-ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
+.controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+
+/* ---------- range slider pair ---------- */
+.range-wrap{display:grid;gap:6px}
+.range-row{display:flex;gap:8px;align-items:center}
+.range-row input[type=range]{flex:1}
+.range-row input[type=number]{width:120px}
+
+/* ---------- results cards ---------- */
+.results-grid{display:grid;gap:12px;grid-template-columns:repeat(3,1fr)}
+@media(max-width:1100px){.results-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:720px){.results-grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden;display:flex;flex-direction:column}
+.card .img{height:160px;background:#071018;display:flex;align-items:center;justify-content:center}
+.card img{width:100%;height:100%;object-fit:cover}
+.card .body{padding:10px;display:flex;flex-direction:column;gap:8px}
+.card .title{font-weight:800}
+.card .meta{color:var(--muted);font-size:13px}
+.card .tags{display:flex;gap:6px;flex-wrap:wrap}
+
+/* ---------- actions bar ---------- */
+.top-actions{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:8px 0}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{background:#071018;border:1px solid var(--line);padding:6px 10px;border-radius:999px;font-size:13px;color:var(--muted)}
+
+/* ---------- details dialog (page) ---------- */
+.detail{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px}
+.detail .hero{display:flex;gap:12px;flex-wrap:wrap}
+.detail img{width:360px;max-width:100%;border-radius:10px;object-fit:cover}
+.specs{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-top:10px}
+.spec{background:#071018;border:1px solid var(--line);padding:8px;border-radius:8px;color:var(--muted)}
+
+/* ---------- compare table ---------- */
+.table-wrap{overflow:auto;background:var(--card);padding:12px;border-radius:12px;border:1px solid var(--line)}
+.compare-table{width:100%;border-collapse:collapse;color:var(--ink)}
+.compare-table th, .compare-table td{padding:8px;border-bottom:1px solid #0a1220;text-align:center}
+.compare-table th{background:#071018;color:var(--muted);font-weight:700}
+
+/* small helpers */
+.small{font-size:13px;color:var(--muted)}
+.tag{background:#071018;border:1px solid var(--line);padding:6px 8px;border-radius:8px;font-size:13px;color:#cfe1ff}
+.checkbox-compare{display:flex;align-items:center;gap:6px}
+.footer{color:var(--muted);text-align:center;padding:18px;font-size:13px}
+.link{color:var(--accent);text-decoration:underline;cursor:pointer}
+</style>
 </head>
 <body>
-  <header>
-    <h1>iFindCar 🚗</h1>
-  </header>
-
-  <div class="container">
-
-    <!-- מסך חיפוש -->
-    <div id="search-screen">
-      <h2>סינון רכבים</h2>
-      <div class="form-group">
-        <label for="make">יצרן</label>
-        <select id="make">
-          <option value="">בחר יצרן</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label for="model">דגם</label>
-        <select id="model">
-          <option value="">בחר דגם</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>טווח מחיר</label>
-        <input type="number" id="price-min" placeholder="מינימום">
-        <input type="number" id="price-max" placeholder="מקסימום">
-      </div>
-      <div class="form-group">
-        <label>שנה</label>
-        <input type="number" id="year-min" placeholder="מינימום">
-        <input type="number" id="year-max" placeholder="מקסימום">
-      </div>
-      <div class="form-group">
-        <label>הספק (כ"ס)</label>
-        <input type="number" id="power-min" placeholder="מינימום">
-        <input type="number" id="power-max" placeholder="מקסימום">
-      </div>
-      <div class="form-group">
-        <label>מימדים (ס"מ)</label>
-        <input type="number" id="length-min" placeholder="אורך מינ'">
-        <input type="number" id="length-max" placeholder="אורך מקס'">
-        <input type="number" id="width-min" placeholder="רוחב מינ'">
-        <input type="number" id="width-max" placeholder="רוחב מקס'">
-        <input type="number" id="height-min" placeholder="גובה מינ'">
-        <input type="number" id="height-max" placeholder="גובה מקס'">
-      </div>
-      <div class="form-group">
-        <label>נפח תא מטען (ליטר)</label>
-        <input type="number" id="trunk-min" placeholder="מינימום">
-        <input type="number" id="trunk-max" placeholder="מקסימום">
-      </div>
-      <div class="form-group">
-        <label>אבזור</label>
-        <div class="checkbox-group" id="features">
-          <!-- ימולא אוטומטית -->
-        </div>
-      </div>
-      <button id="search-btn">חפש רכבים</button>
+<div class="container">
+  <div class="header">
+    <div>
+      <div class="brand">iFindCar — מנוע חיפוש והשוואה</div>
+      <div class="smallmuted">טוען נתונים מקובץ <code>cars.json</code></div>
     </div>
-
-    <!-- מסך תוצאות -->
-    <div id="results-screen" class="hidden">
-      <button class="back-btn" id="back-btn">🔄 שנה חיפוש</button>
-      <div class="results" id="results"></div>
+    <div>
+      <button id="goToSearch" class="btn btn-ghost hidden">שנה חיפוש</button>
+      <button id="goToCompare" class="btn btn-ghost hidden">השווה (<span id="compareCount">0</span>)</button>
     </div>
-
   </div>
 
-  <script>
-    let cars = [];
-    let allFeatures = new Set();
+  <!-- ======= SCREEN: FILTER (step 1) ======= -->
+  <section id="screen-search" class="panel">
+    <div class="title">חיפוש וסינון</div>
 
-    async function loadData() {
-      const res = await fetch("cars.json"); // צריך להיות באותו תיק
-      cars = await res.json();
+    <div class="form-grid">
+      <div>
+        <label for="selMake">יצרן</label>
+        <select id="selMake"><option value="">כל היצרנים</option></select>
+      </div>
+      <div>
+        <label for="selModel">דגם</label>
+        <select id="selModel" disabled><option value="">כל הדגמים</option></select>
+      </div>
 
-      // יצרנים
-      const makes = [...new Set(cars.map(c => c.make))];
-      const makeSelect = document.getElementById("make");
-      makes.forEach(m => {
-        const opt = document.createElement("option");
-        opt.value = m;
-        opt.textContent = m;
-        makeSelect.appendChild(opt);
-      });
+      <div>
+        <label>טווח מחיר (₪)</label>
+        <div class="range-wrap">
+          <div class="range-row">
+            <input id="priceMinRange" type="range"><input id="priceMinNum" type="number" />
+          </div>
+          <div class="range-row">
+            <input id="priceMaxRange" type="range"><input id="priceMaxNum" type="number" />
+          </div>
+        </div>
+      </div>
+      <div>
+        <label>טווח שנה</label>
+        <div class="range-wrap">
+          <div class="range-row">
+            <input id="yearMinRange" type="range"><input id="yearMinNum" type="number" />
+          </div>
+          <div class="range-row">
+            <input id="yearMaxRange" type="range"><input id="yearMaxNum" type="number" />
+          </div>
+        </div>
+      </div>
 
-      // מאפיינים (אבזור)
-      cars.forEach(c => {
-        if (c.features) {
-          c.features.forEach(f => allFeatures.add(f));
-        }
-      });
-      const featuresDiv = document.getElementById("features");
-      allFeatures.forEach(f => {
-        const label = document.createElement("label");
-        const cb = document.createElement("input");
-        cb.type = "checkbox";
-        cb.value = f;
-        label.appendChild(cb);
-        label.appendChild(document.createTextNode(f));
-        featuresDiv.appendChild(label);
-      });
+      <div>
+        <label>טווח הספק (כ״ס)</label>
+        <div class="range-wrap">
+          <div class="range-row">
+            <input id="powerMinRange" type="range"><input id="powerMinNum" type="number" />
+          </div>
+          <div class="range-row">
+            <input id="powerMaxRange" type="range"><input id="powerMaxNum" type="number" />
+          </div>
+        </div>
+      </div>
+      <div>
+        <label>סוג מנוע</label>
+        <select id="selEngine">
+          <option value="">כל סוגי המנוע</option>
+        </select>
+      </div>
+
+      <div>
+        <label>אורך (מ״מ)</label>
+        <div class="range-wrap">
+          <div class="range-row">
+            <input id="lenMinRange" type="range"><input id="lenMinNum" type="number"/>
+          </div>
+          <div class="range-row">
+            <input id="lenMaxRange" type="range"><input id="lenMaxNum" type="number"/>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label>רוחב (מ״מ)</label>
+        <div class="range-wrap">
+          <div class="range-row">
+            <input id="widMinRange" type="range"><input id="widMinNum" type="number"/>
+          </div>
+          <div class="range-row">
+            <input id="widMaxRange" type="range"><input id="widMaxNum" type="number"/>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label>גובה (מ״מ)</label>
+        <div class="range-wrap">
+          <div class="range-row">
+            <input id="heiMinRange" type="range"><input id="heiMinNum" type="number"/>
+          </div>
+          <div class="range-row">
+            <input id="heiMaxRange" type="range"><input id="heiMaxNum" type="number"/>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label>נפח תא מטען (ליטר)</label>
+        <div class="range-wrap">
+          <div class="range-row">
+            <input id="trunkMinRange" type="range"><input id="trunkMinNum" type="number"/>
+          </div>
+          <div class="range-row">
+            <input id="trunkMaxRange" type="range"><input id="trunkMaxNum" type="number"/>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top:12px">
+      <label>איבזור (אפשר לסמן כמה)</label>
+      <div id="featuresArea" class="row"></div>
+    </div>
+
+    <div class="controls">
+      <button id="btnSearch">חפש רכבים</button>
+      <button id="btnReset" class="btn-ghost">נקה סינון</button>
+      <div class="smallmuted" id="dataInfo">טוען נתונים…</div>
+    </div>
+  </section>
+
+  <!-- ======= SCREEN: RESULTS ======= -->
+  <section id="screen-results" class="hidden">
+    <div class="top-actions">
+      <div class="chips" id="activeChips"></div>
+      <div class="row">
+        <div class="smallmuted" id="resultsInfo"></div>
+        <button id="btnBackToSearch" class="btn btn-ghost">שנה חיפוש</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div class="smallmuted">תוצאות</div>
+        <div>
+          <button id="btnSelectAll" class="btn-ghost">מסמן הכל</button>
+          <button id="btnCompare" class="btn" disabled>השווה</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="resultsGrid" class="results-grid"></div>
+  </section>
+
+  <!-- ======= SCREEN: DETAIL (same page show) ======= -->
+  <section id="screen-detail" class="hidden">
+    <div style="margin-bottom:10px">
+      <button id="btnBackFromDetail" class="btn btn-ghost">חזור לתוצאות</button>
+    </div>
+    <div id="detailWrap" class="detail"></div>
+  </section>
+
+  <!-- ======= SCREEN: COMPARE ======= -->
+  <section id="screen-compare" class="hidden">
+    <div style="margin-bottom:10px">
+      <button id="btnBackFromCompare" class="btn btn-ghost">חזור</button>
+    </div>
+    <div class="table-wrap">
+      <table id="compareTable" class="compare-table"></table>
+    </div>
+  </section>
+
+  <div class="footer">גרסה ראשונית — שדרוגים נוספים לפי פידבק</div>
+</div>
+
+<script>
+/* ================== UTILITIES / STATE ================== */
+let DATA = []; // raw loaded
+let CARS = []; // normalized
+const state = {
+  selectedCompare: new Set(),
+  filters: {},
+  meta: {}
+};
+
+const el = id => document.getElementById(id);
+const formatNum = n => n==null ? '—' : (typeof n==='number' ? n.toLocaleString('he-IL') : String(n));
+
+/* ======== normalize data to expected fields ========
+ Expect cars.json items to have (some of): make,model,trim,price,year,power,engine,image,features (array or object),
+ specs object (length,width,height,trunk,powerHP etc), source, scrapedAt/updated
+==================================================== */
+function normalizeRaw(raw){
+  return raw.map((r, i) => {
+    // features: support array of strings or object of booleans
+    let featuresArr = [];
+    if (Array.isArray(r.features)) featuresArr = r.features.slice();
+    else if (r.features && typeof r.features === 'object') {
+      featuresArr = Object.entries(r.features).filter(([k,v])=>!!v).map(([k])=>k);
     }
+    // specs: flatten possible nested names
+    const specs = r.specs && typeof r.specs==='object' ? {...r.specs} : {};
+    // convenience: dimensions in specs (length,width,height)
+    function maybeNumber(v){ if(v==null) return null; if(typeof v==='number') return v; const s=String(v).replace(/[^\d.-]/g,''); const n=Number(s); return Number.isFinite(n)?n:null; }
+    return {
+      id: r.id ?? i,
+      make: r.make ?? r.brand ?? '',
+      model: r.model ?? r.version ?? '',
+      trim: r.trim ?? '',
+      title: [r.make, r.model, r.trim].filter(Boolean).join(' ').trim(),
+      price: maybeNumber(r.price ?? r.price_nis ?? null),
+      year: maybeNumber(r.year ?? r.production_year ?? null),
+      power: maybeNumber(r.power ?? specs.powerHP ?? specs.hp ?? null),
+      engine: (r.engine ?? '').toString(),
+      image: r.image ?? r.img ?? '',
+      features: featuresArr,
+      specs,
+      source: r.source ?? r.url ?? '',
+      scrapedAt: r.scrapedAt ?? r.updated ?? null
+    };
+  });
+}
 
-    document.getElementById("make").addEventListener("change", (e) => {
-      const modelSelect = document.getElementById("model");
-      modelSelect.innerHTML = "<option value=''>בחר דגם</option>";
-      const selectedMake = e.target.value;
-      const models = [...new Set(cars.filter(c => c.make === selectedMake).map(c => c.model))];
-      models.forEach(m => {
-        const opt = document.createElement("option");
-        opt.value = m;
-        opt.textContent = m;
-        modelSelect.appendChild(opt);
-      });
-    });
+/* ================== LOAD & INIT ================== */
+async function loadData(){
+  try{
+    const res = await fetch('./cars.json', {cache:'no-store'});
+    const raw = await res.json();
+    DATA = Array.isArray(raw) ? raw : (raw.cars || []);
+    CARS = normalizeRaw(DATA);
+    state.meta.last = mostRecentScraped(CARS);
+    initControls();
+    showSearch();
+    el('dataInfo').textContent = `טענו ${CARS.length} רשומות ${state.meta.last ? ' • עודכן: '+ new Date(state.meta.last).toLocaleString('he-IL') : ''}`;
+  }catch(err){
+    el('dataInfo').textContent = 'שגיאת טעינה: ' + err.message;
+    console.error(err);
+  }
+}
+function mostRecentScraped(list){ let t=0; list.forEach(x=>{ const d=Date.parse(x.scrapedAt||''); if(!isNaN(d)) t=Math.max(t,d); }); return t||null; }
 
-    document.getElementById("search-btn").addEventListener("click", () => {
-      const filters = {
-        make: document.getElementById("make").value,
-        model: document.getElementById("model").value,
-        priceMin: +document.getElementById("price-min").value || 0,
-        priceMax: +document.getElementById("price-max").value || Infinity,
-        yearMin: +document.getElementById("year-min").value || 0,
-        yearMax: +document.getElementById("year-max").value || Infinity,
-        powerMin: +document.getElementById("power-min").value || 0,
-        powerMax: +document.getElementById("power-max").value || Infinity,
-        lengthMin: +document.getElementById("length-min").value || 0,
-        lengthMax: +document.getElementById("length-max").value || Infinity,
-        widthMin: +document.getElementById("width-min").value || 0,
-        widthMax: +document.getElementById("width-max").value || Infinity,
-        heightMin: +document.getElementById("height-min").value || 0,
-        heightMax: +document.getElementById("height-max").value || Infinity,
-        trunkMin: +document.getElementById("trunk-min").value || 0,
-        trunkMax: +document.getElementById("trunk-max").value || Infinity,
-        features: [...document.querySelectorAll("#features input:checked")].map(cb => cb.value)
-      };
+/* ================== BUILD FILTER UI ================== */
+function uniqueSorted(arr){ return Array.from(new Set(arr.filter(Boolean))).sort((a,b)=> (''+a).localeCompare(''+b,'he')); }
 
-      const results = cars.filter(c => {
-        return (!filters.make || c.make === filters.make) &&
-               (!filters.model || c.model === filters.model) &&
-               (c.price >= filters.priceMin && c.price <= filters.priceMax) &&
-               (c.year >= filters.yearMin && c.year <= filters.yearMax) &&
-               (c.power >= filters.powerMin && c.power <= filters.powerMax) &&
-               (c.dimensions.length >= filters.lengthMin && c.dimensions.length <= filters.lengthMax) &&
-               (c.dimensions.width >= filters.widthMin && c.dimensions.width <= filters.widthMax) &&
-               (c.dimensions.height >= filters.heightMin && c.dimensions.height <= filters.heightMax) &&
-               (c.trunk >= filters.trunkMin && c.trunk <= filters.trunkMax) &&
-               filters.features.every(f => c.features.includes(f));
-      });
+function initControls(){
+  // makes & models
+  const makes = uniqueSorted(CARS.map(c=>c.make));
+  const makeSel = el('selMake');
+  makeSel.innerHTML = '<option value="">כל היצרנים</option>' + makes.map(m=>`<option>${escapeHtml(m)}</option>`).join('');
 
-      const resultsDiv = document.getElementById("results");
-      resultsDiv.innerHTML = "";
-      results.forEach(c => {
-        const card = document.createElement("div");
-        card.className = "car-card";
-        card.innerHTML = `
-          <img src="${c.image || 'https://via.placeholder.com/250'}" alt="${c.make} ${c.model}">
-          <h3>${c.make} ${c.model}</h3>
-          <p>מחיר: ${c.price} ₪</p>
-          <p>שנה: ${c.year}</p>
-          <p>כוח: ${c.power} כ"ס</p>
-        `;
-        resultsDiv.appendChild(card);
-      });
+  makeSel.addEventListener('change', ()=>{
+    const selected = makeSel.value;
+    buildModelSelect(selected);
+  });
+  buildModelSelect('');
 
-      document.getElementById("search-screen").classList.add("hidden");
-      document.getElementById("results-screen").classList.remove("hidden");
-    });
+  // engines
+  const engines = uniqueSorted(CARS.map(c=>c.engine).filter(Boolean));
+  el('selEngine').innerHTML = '<option value="">כל סוגי המנוע</option>' + engines.map(e=>`<option value="${escapeHtml(e)}">${escapeHtml(e)}</option>`).join('');
 
-    document.getElementById("back-btn").addEventListener("click", () => {
-      document.getElementById("results-screen").classList.add("hidden");
-      document.getElementById("search-screen").classList.remove("hidden");
-    });
+  // features - collect keys
+  const featSet = new Set();
+  CARS.forEach(c => c.features.forEach(f => featSet.add(f)));
+  const featArr = Array.from(featSet);
+  const fArea = el('featuresArea');
+  fArea.innerHTML = featArr.map(f => `
+    <label style="display:inline-flex;align-items:center;gap:8px">
+      <input type="checkbox" data-feat="${escapeHtml(f)}"> <span class="tag">${escapeHtml(f)}</span>
+    </label>
+  `).join('');
 
-    loadData();
-  </script>
+  // numeric ranges: price, year, power, specs: length,width,height,trunk
+  const nums = {
+    price: CARS.map(c=>c.price).filter(n=>n!=null),
+    year: CARS.map(c=>c.year).filter(n=>n!=null),
+    power: CARS.map(c=>c.power).filter(n=>n!=null)
+  };
+  const specsKeys = ['length','width','height','trunk'];
+  specsKeys.forEach(k=>{
+    const vals = CARS.map(c=>{ const v=c.specs?.[k]; return (v==null)?null: Number(String(v).replace(/[^\d.-]/g,'')) }).filter(n=>n!=null);
+    if(vals.length) nums[k] = vals;
+  });
+
+  // set up range inputs helper
+  function setupRange(key, defaultMin, defaultMax){
+    const min = Math.min(...nums[key]);
+    const max = Math.max(...nums[key]);
+    // clamps in case of NaN
+    if(!Number.isFinite(min) || !Number.isFinite(max)) return;
+    const minR = el(key+'MinRange'), maxR = el(key+'MaxRange');
+    const minN = el(key+'MinNum'), maxN = el(key+'MaxNum');
+    // if element not exists (e.g., some spec), skip
+    if(!minR||!maxR||!minN||!maxN) return;
+    minR.min = minR.value = minN.value = defaultMin ?? min;
+    maxR.max = maxR.value = maxN.value = defaultMax ?? max;
+    minR.max = max; maxR.min = min;
+    minR.step = maxR.step = Math.max(1, Math.floor((max-min)/100)||1);
+    minN.min = min; minN.max = max; maxN.min = min; maxN.max = max;
+
+    // sync range -> number and number -> range
+    minR.addEventListener('input', ()=>{ let v = Number(minR.value); if(v>Number(maxN.value)){ v=Number(maxN.value); minR.value=v } minN.value=v; });
+    maxR.addEventListener('input', ()=>{ let v = Number(maxR.value); if(v<Number(minN.value)){ v=Number(minN.value); maxR.value=v } maxN.value=v; });
+    minN.addEventListener('change', ()=>{ let v=Number(minN.value||min); if(v>Number(maxN.value)) v=Number(maxN.value); minR.value=v; minN.value=v });
+    maxN.addEventListener('change', ()=>{ let v=Number(maxN.value||max); if(v<Number(minN.value)) v=Number(minN.value); maxR.value=v; maxN.value=v });
+
+    // set initial numbers if empty
+    if(!minN.value) minN.value = min;
+    if(!maxN.value) maxN.value = max;
+  }
+
+  // setup for known keys
+  ['price','year','power','len','wid','hei','trunk'].forEach(k=>{
+    // map internal keys to element ids:
+    const map = {len:'length', wid:'width', hei:'height'};
+    const key = map[k] || k;
+    if(nums[key]) {
+      setupRange(key, Math.min(...nums[key]), Math.max(...nums[key]));
+    }
+  });
+
+  // also try numeric ids for specs we created earlier
+  ['length','width','height','trunk'].forEach(k=>{
+    if(nums[k]) setupRange(k, Math.min(...nums[k]), Math.max(...nums[k]));
+  });
+
+  // attach buttons
+  el('btnSearch').onclick = onSearch;
+  el('btnReset').onclick = resetFilters;
+  el('btnBackToSearch').onclick = ()=>{ showSearch(); window.scrollTo(0,0) };
+  el('goToSearch').onclick = ()=>{ showSearch(); window.scrollTo(0,0) };
+  el('btnBackFromDetail').onclick = ()=>{ showResults(); window.scrollTo(0,0) };
+  el('btnBackFromCompare').onclick = ()=>{ showResults(); window.scrollTo(0,0) };
+  el('btnSelectAll').onclick = toggleSelectAll;
+  el('btnCompare').onclick = ()=>{ if(state.selectedCompare.size>=2) showCompare(); };
+}
+
+function buildModelSelect(selectedMake){
+  const models = uniqueSorted(CARS.filter(c=> !selectedMake || c.make===selectedMake ).map(c=>c.model));
+  const sel = el('selModel');
+  sel.innerHTML = '<option value="">כל הדגמים</option>' + models.map(m=>`<option>${escapeHtml(m)}</option>`).join('');
+  sel.disabled = models.length === 0;
+}
+
+/* ================== SEARCH / FILTER LOGIC ================== */
+function readFilters(){
+  const f = {};
+  f.make = el('selMake').value || '';
+  f.model = el('selModel').value || '';
+  f.engine = el('selEngine').value || '';
+
+  function readRange(key){
+    const min = Number(el(key+'MinNum')?.value || el(key+'MinRange')?.value || 0);
+    const max = Number(el(key+'MaxNum')?.value || el(key+'MaxRange')?.value || Infinity);
+    return [isNaN(min)?0:min, isNaN(max)?Infinity:max];
+  }
+  const [pmin,pmax] = readRange('price');
+  const [ymin,ymax] = readRange('year');
+  const [powmin,powmax] = readRange('power');
+  const [lenmin,lenmax] = readRange('length');
+  const [widmin,widmax] = readRange('width');
+  const [heimin,heimax] = readRange('height');
+  const [trmin,trmax] = readRange('trunk');
+
+  // features: three-state: '' (all), 'true' (must have), 'false' (must NOT have)
+  const featureNodes = [...document.querySelectorAll('#featuresArea input[type=checkbox]')];
+  const featuresMust = featureNodes.filter(n=>n.checked).map(n=>n.dataset.feat);
+
+  return { f, price:[pmin,pmax], year:[ymin,ymax], power:[powmin,powmax], engine:f.engine, dims:{lenmin,lenmax,widmin,widmax,heimin,heimax}, trunk:[trmin,trmax], featuresMust };
+}
+
+function onSearch(){
+  const filters = readFilters();
+  state.lastFilters = filters;
+  // filter list
+  const list = CARS.filter(c=>{
+    if(filters.f.make && c.make !== filters.f.make) return false;
+    if(filters.f.model && c.model !== filters.f.model) return false;
+    if(filters.engine && filters.engine !== '' && !String(c.engine).toLowerCase().includes(String(filters.engine).toLowerCase())) return false;
+    // price/year/power
+    if((c.price==null) || c.price < filters.price[0] || c.price > filters.price[1]) return false;
+    if((c.year==null) || c.year < filters.year[0] || c.year > filters.year[1]) return false;
+    if((c.power==null) || c.power < filters.power[0] || c.power > filters.power[1]) return false;
+    // dimensions
+    const len = maybeNum(c.specs?.length); if(len==null || len < filters.dims.lenmin || len > filters.dims.lenmax) return false;
+    const wid = maybeNum(c.specs?.width); if(wid==null || wid < filters.dims.widmin || wid > filters.dims.widmax) return false;
+    const hei = maybeNum(c.specs?.height); if(hei==null || hei < filters.dims.heimin || hei > filters.dims.heimax) return false;
+    // trunk
+    const tr = maybeNum(c.specs?.trunk) ?? maybeNum(c.trunk);
+    if(tr==null || tr < filters.trunk[0] || tr > filters.trunk[1]) return false;
+    // featuresMust
+    for(const f of filters.featuresMust){ if(!c.features.includes(f)) return false; }
+    return true;
+  });
+
+  renderResults(list);
+  showResults();
+}
+
+/* ================== RENDER RESULTS / CAR CARD / DETAIL ================== */
+function renderResults(list){
+  const grid = el('resultsGrid');
+  grid.innerHTML = list.map(c => cardHTML(c)).join('');
+  el('resultsInfo').textContent = `${list.length} תוצאות`;
+  // active chips
+  const chips = [];
+  if(state.lastFilters?.f?.make) chips.push(state.lastFilters.f.make);
+  if(state.lastFilters?.f?.model) chips.push(state.lastFilters.f.model);
+  if(state.lastFilters?.price) chips.push(`מחיר ${state.lastFilters.price[0]}–${state.lastFilters.price[1]}`);
+  el('activeChips').innerHTML = chips.map(t=>`<div class="chip">${escapeHtml(t)}</div>`).join('');
+  // rebind compare checkboxes
+  document.querySelectorAll('.compare-checkbox').forEach(cb=>{
+    cb.addEventListener('change', onCompareCheckbox);
+  });
+  updateCompareButtons();
+}
+
+function cardHTML(c){
+  const featShort = c.features.slice(0,3).map(f=>`<span class="tag">${escapeHtml(f)}</span>`).join(' ');
+  return `
+  <div class="card" data-id="${c.id}">
+    <div class="img">${c.image ? `<img src="${escapeHtml(c.image)}" loading="lazy">` : '<div class="smallmuted" style="padding:24px">אין תמונה</div>'}</div>
+    <div class="body">
+      <div style="display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div class="title">${escapeHtml(c.title || (c.make+' '+c.model))}</div>
+          <div class="meta">${escapeHtml(c.make)} • ${escapeHtml(c.model)}</div>
+        </div>
+        <div style="text-align:left">
+          <div style="margin-bottom:8px;font-weight:800">${c.price!=null?c.price.toLocaleString('he-IL')+' ₪':'—'}</div>
+          <label class="checkbox-compare"><input type="checkbox" class="compare-checkbox" data-id="${c.id}"> השווה</label>
+        </div>
+      </div>
+      <div class="tags">${featShort}</div>
+      <div style="display:flex;gap:8px;margin-top:8px">
+        <button class="btn" onclick="openDetail('${c.id}')">פתח</button>
+        ${c.source?`<a class="btn btn-ghost" href="${escapeHtml(c.source)}" target="_blank" rel="noopener">מקור</a>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function maybeNum(v){ if(v==null) return null; const n=Number(String(v).replace(/[^\d.-]/g,'')); return Number.isFinite(n)?n:null; }
+
+function openDetail(id){
+  const c = CARS.find(x=>String(x.id)===String(id));
+  if(!c) return;
+  // render detail
+  const wrap = el('detailWrap');
+  wrap.innerHTML = `
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div><img src="${escapeHtml(c.image)}" alt="" style="width:360px;max-width:100%"></div>
+      <div style="flex:1">
+        <h2 style="margin:0 0 8px">${escapeHtml(c.title)}</h2>
+        <div class="smallmuted">יצרן: ${escapeHtml(c.make)} • דגם: ${escapeHtml(c.model)}</div>
+        <div style="margin-top:10px;font-weight:800">${c.price!=null?c.price.toLocaleString('he-IL')+' ₪':'—'}</div>
+        <div style="margin-top:8px" class="smallmuted">מנוע: ${escapeHtml(c.engine||'—')} • הספק: ${formatNum(c.power)} • שנה: ${formatNum(c.year)}</div>
+        <div style="margin-top:10px"><b>איבזור בולט:</b> ${c.features.length? c.features.map(f=>`<span class="tag">${escapeHtml(f)}</span>`).join(' ') : '<span class="smallmuted">אין נתונים</span>'}</div>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <div><b>מפרט מלא</b></div>
+      <div class="specs">${Object.entries(c.specs||{}).map(([k,v])=>`<div class="spec"><b>${escapeHtml(k)}</b><div class="small">${escapeHtml(String(v))}</div></div>`).join('')}</div>
+    </div>
+  `;
+  showDetail();
+  window.scrollTo(0,0);
+}
+
+/* ================== COMPARE ================== */
+function onCompareCheckbox(e){
+  const id = e.target.dataset.id;
+  if(e.target.checked) state.selectedCompare.add(id); else state.selectedCompare.delete(id);
+  updateCompareButtons();
+}
+function updateCompareButtons(){
+  const n = state.selectedCompare.size;
+  el('compareCount').textContent = n;
+  el('goToCompare').classList.toggle('hidden', n<2);
+  el('goToCompare').disabled = n<2;
+  el('btnCompare').disabled = n<2;
+}
+function toggleSelectAll(){
+  const boxes = Array.from(document.querySelectorAll('.compare-checkbox'));
+  const allChecked = boxes.every(b => b.checked);
+  boxes.forEach(b=>{ b.checked = !allChecked; const ev=new Event('change'); b.dispatchEvent(ev); });
+}
+function showCompare(){
+  // build table columns from selected ids
+  const ids = Array.from(state.selectedCompare);
+  const rows = [
+    {k:'תמונה', fn: c=>`<img src="${escapeHtml(c.image)}" style="width:120px;height:auto;border-radius:6px">`},
+    {k:'כותרת', fn: c=>escapeHtml(c.title)},
+    {k:'יצרן', fn: c=>escapeHtml(c.make)},
+    {k:'דגם', fn: c=>escapeHtml(c.model)},
+    {k:'מחיר', fn: c=>c.price!=null?c.price.toLocaleString('he-IL')+' ₪':'—'},
+    {k:'שנה', fn: c=>formatNum(c.year)},
+    {k:'מנוע', fn: c=>escapeHtml(c.engine)},
+    {k:'הספק', fn: c=>formatNum(c.power)},
+    {k:'איבזור', fn: c=> c.features.map(f=>escapeHtml(f)).join(', ') || '—'},
+    {k:'מפרט נבחר', fn: c=>{
+      // show some key specs
+      const want = ['length','width','height','trunk','powerHP'];
+      return want.map(k=>`${escapeHtml(k)}: ${escapeHtml(String(c.specs?.[k]??'—'))}`).join('<br>');
+    }}
+  ];
+  const tbl = el('compareTable');
+  // header
+  tbl.innerHTML = '<thead><tr><th>שדה</th>' + ids.map(id=>`<th>${escapeHtml(CARS.find(c=>String(c.id)===id)?.title||id)}</th>`).join('') + '</tr></thead>';
+  // body rows
+  const body = rows.map(r => `<tr><th style="text-align:right">${r.k}</th>${ids.map(id=>`<td>${r.fn(CARS.find(c=>String(c.id)===id))}</td>`).join('')}</tr>`).join('');
+  tbl.innerHTML += '<tbody>' + body + '</tbody>';
+  showCompare();
+}
+
+/* ================== VIEW SWITCHING ================== */
+function hideAllScreens(){ ['screen-search','screen-results','screen-detail','screen-compare'].forEach(id=>el(id).classList.add('hidden')); }
+function showSearch(){ hideAllScreens(); el('screen-search').classList.remove('hidden'); el('goToSearch').classList.add('hidden'); el('goToCompare').classList.add('hidden'); }
+function showResults(){ hideAllScreens(); el('screen-results').classList.remove('hidden'); el('goToSearch').classList.remove('hidden'); }
+function showDetail(){ hideAllScreens(); el('screen-detail').classList.remove('hidden'); el('goToSearch').classList.remove('hidden'); }
+function showCompare(){ hideAllScreens(); el('screen-compare').classList.remove('hidden'); el('goToSearch').classList.remove('hidden'); }
+
+/* ================== HELPERS ================== */
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+function uniqueSorted(a){ return Array.from(new Set(a.filter(Boolean))).sort((x,y)=> (''+x).localeCompare(''+y,'he')); }
+
+/* ================== RESET ================== */
+function resetFilters(){
+  el('selMake').value=''; buildModelSelect('');
+  el('selEngine').value='';
+  // reset numeric inputs if exist
+  ['price','year','power','length','width','height','trunk'].forEach(k=>{
+    const minN = el(k+'MinNum'), maxN = el(k+'MaxNum');
+    if(minN && maxN){
+      minN.value = minN.min || 0; maxN.value = maxN.max || maxN.value;
+      const minR = el(k+'MinRange'), maxR = el(k+'MaxRange');
+      if(minR) minR.value = minN.value; if(maxR) maxR.value = maxN.value;
+    }
+  });
+  // uncheck features
+  document.querySelectorAll('#featuresArea input[type=checkbox]').forEach(n=>n.checked=false);
+  state.selectedCompare.clear();
+  updateCompareButtons();
+  el('activeChips').innerHTML='';
+}
+
+/* ================== BOOT ================== */
+loadData();
+
+/* ========== expose some functions to global for inline handlers ========== */
+window.openDetail = openDetail;
+window.showCompare = showCompare;
+window.escapeHtml = escapeHtml;
+</script>
 </body>
 </html>
