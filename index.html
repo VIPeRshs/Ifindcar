@@ -1,409 +1,259 @@
-<!doctype html>
-<html lang="he" dir="rtl">
+<!DOCTYPE html>
+<html lang="he">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>iFindCar — סינון</title>
-<style>
-:root{--bg:#0b0c10;--ink:#e9eef5;--muted:#9fb0cc;--card:#15171d;--line:#212734;--accent:#5ab0ff}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial}
-a{color:inherit}
-h1{margin:0 0 6px 0;font-size:22px}
-small.m{color:var(--muted)}
-.wrap{max-width:1100px;margin:0 auto;padding:16px}
-.panel{background:#0f1218;border:1px solid var(--line);border-radius:14px;padding:14px}
-.grid{display:grid;gap:12px}
-.grid2{display:grid;gap:12px;grid-template-columns:repeat(2,minmax(0,1fr))}
-.grid3{display:grid;gap:12px;grid-template-columns:repeat(3,minmax(0,1fr))}
-input,select,button{border:1px solid var(--line);background:#0b0f15;color:var(--ink);border-radius:10px;padding:10px 12px}
-input[type=number]{appearance:textfield}
-input[type=range]{width:100%}
-label{font-weight:600;font-size:13px;margin-bottom:6px;display:block}
-.row{display:grid;gap:6px}
-.box{border:1px solid var(--line);background:#0b0f15;border-radius:12px;padding:10px}
-.tri{display:flex;gap:8px}
-.tri label{font-weight:400}
-.btn{background:var(--accent);color:#06223d;border:none;border-radius:10px;padding:10px 14px;font-weight:800;cursor:pointer}
-.btn.ghost{background:#0b0f15;color:var(--muted);border:1px solid var(--line)}
-.controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-.chip{border:1px solid var(--line);background:#0b0f15;border-radius:999px;padding:4px 8px;font-size:12px;color:#cfe1ff}
-.resultBar{display:flex;justify-content:space-between;align-items:center;margin-top:14px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.list{display:grid;gap:12px;margin-top:12px}
-.item{display:flex;gap:12px;padding:10px}
-.pic{width:140px;aspect-ratio:16/10;background:#0f1218;flex:0 0 auto;display:flex;align-items:center;justify-content:center}
-.pic img{width:100%;height:100%;object-fit:cover}
-.meta{font-size:13px;color:var(--muted)}
-.hide{display:none}
-</style>
+  <meta charset="UTF-8">
+  <title>iFindCar - חיפוש רכבים</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      direction: rtl;
+      margin: 0;
+      padding: 0;
+      background: #f7f7f7;
+    }
+    header {
+      background: #2c3e50;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+    .hidden {
+      display: none;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+    }
+    select, input[type="number"] {
+      width: 100%;
+      padding: 8px;
+    }
+    .checkbox-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .checkbox-group label {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    button {
+      background: #2980b9;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      border-radius: 5px;
+    }
+    button:hover {
+      background: #3498db;
+    }
+    .results {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .car-card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      padding: 15px;
+    }
+    .car-card img {
+      max-width: 100%;
+      border-radius: 5px;
+    }
+    .back-btn {
+      margin-bottom: 20px;
+      background: #27ae60;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <h1>מסך סינון — iFindCar</h1>
-    <small class="m">כל הערכים נבנים אוטומטית מתוך <code>cars.json</code>.</small>
+  <header>
+    <h1>iFindCar 🚗</h1>
+  </header>
 
-    <div class="panel grid" id="filterPanel">
-      <!-- בחירת יצרן/דגם -->
-      <div class="grid2">
-        <div class="row">
-          <label for="makeSel">יצרן</label>
-          <select id="makeSel"></select>
+  <div class="container">
+
+    <!-- מסך חיפוש -->
+    <div id="search-screen">
+      <h2>סינון רכבים</h2>
+      <div class="form-group">
+        <label for="make">יצרן</label>
+        <select id="make">
+          <option value="">בחר יצרן</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="model">דגם</label>
+        <select id="model">
+          <option value="">בחר דגם</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>טווח מחיר</label>
+        <input type="number" id="price-min" placeholder="מינימום">
+        <input type="number" id="price-max" placeholder="מקסימום">
+      </div>
+      <div class="form-group">
+        <label>שנה</label>
+        <input type="number" id="year-min" placeholder="מינימום">
+        <input type="number" id="year-max" placeholder="מקסימום">
+      </div>
+      <div class="form-group">
+        <label>הספק (כ"ס)</label>
+        <input type="number" id="power-min" placeholder="מינימום">
+        <input type="number" id="power-max" placeholder="מקסימום">
+      </div>
+      <div class="form-group">
+        <label>מימדים (ס"מ)</label>
+        <input type="number" id="length-min" placeholder="אורך מינ'">
+        <input type="number" id="length-max" placeholder="אורך מקס'">
+        <input type="number" id="width-min" placeholder="רוחב מינ'">
+        <input type="number" id="width-max" placeholder="רוחב מקס'">
+        <input type="number" id="height-min" placeholder="גובה מינ'">
+        <input type="number" id="height-max" placeholder="גובה מקס'">
+      </div>
+      <div class="form-group">
+        <label>נפח תא מטען (ליטר)</label>
+        <input type="number" id="trunk-min" placeholder="מינימום">
+        <input type="number" id="trunk-max" placeholder="מקסימום">
+      </div>
+      <div class="form-group">
+        <label>אבזור</label>
+        <div class="checkbox-group" id="features">
+          <!-- ימולא אוטומטית -->
         </div>
-        <div class="row">
-          <label for="modelSel">דגם</label>
-          <select id="modelSel" disabled></select>
-        </div>
       </div>
-
-      <!-- טווחים כמותיים כלליים -->
-      <div class="grid3" id="numericGeneral">
-        <!-- נבנה דינמית: מחיר, שנה, מנוע (אם מספרי) -->
-      </div>
-
-      <!-- טווחי specs -->
-      <div>
-        <label>מימדים / מפרט</label>
-        <div class="grid3" id="numericSpecs">
-          <!-- נבנה דינמית: length/width/height/wheelbase/trunk/powerHP ... -->
-        </div>
-      </div>
-
-      <!-- איבזור בוליאני -->
-      <div>
-        <label>איבזור</label>
-        <div class="grid3" id="featureBooleans"></div>
-      </div>
-
-      <div class="controls">
-        <button id="apply" class="btn">החל סינון</button>
-        <button id="clear" class="btn ghost">ניקוי</button>
-        <span id="last" class="m"></span>
-      </div>
+      <button id="search-btn">חפש רכבים</button>
     </div>
 
-    <div class="resultBar">
-      <div>
-        <b id="count">0</b> תוצאות תואמות
-        <span id="chips"></span>
-      </div>
-      <div>
-        <button id="toggleList" class="btn ghost">הצג/הסתר תוצאות</button>
-      </div>
+    <!-- מסך תוצאות -->
+    <div id="results-screen" class="hidden">
+      <button class="back-btn" id="back-btn">🔄 שנה חיפוש</button>
+      <div class="results" id="results"></div>
     </div>
 
-    <div id="resultList" class="list hide"></div>
   </div>
 
-<script>
-const els = {
-  makeSel: document.getElementById('makeSel'),
-  modelSel: document.getElementById('modelSel'),
-  numericGeneral: document.getElementById('numericGeneral'),
-  numericSpecs: document.getElementById('numericSpecs'),
-  featureBooleans: document.getElementById('featureBooleans'),
-  apply: document.getElementById('apply'),
-  clear: document.getElementById('clear'),
-  last: document.getElementById('last'),
-  count: document.getElementById('count'),
-  chips: document.getElementById('chips'),
-  toggleList: document.getElementById('toggleList'),
-  resultList: document.getElementById('resultList'),
-};
+  <script>
+    let cars = [];
+    let allFeatures = new Set();
 
-const FEATURE_LABELS = {
-  cruise:'בקרת שיוט',
-  rearCamera:'מצלמת רוורס',
-  keyless:'כניסה/הנעה ללא מפתח',
-  laneAssist:'שמירת נתיב',
-  aeb:'בלימה אוטונומית',
-};
-const TRI = [['','הכל'],['true','כן'],['false','לא']];
+    async function loadData() {
+      const res = await fetch("cars.json"); // צריך להיות באותו תיק
+      cars = await res.json();
 
-const state = {
-  raw:[],
-  cars:[],
-  makeToModels:new Map(),
-  numerics:{general:{}, specs:{}}, // {key: {min,max}}
-  featureKeys:[],
-  filters:{
-    make:'', model:'',
-    general:{}, specs:{},
-    features:{} // key: '','true','false'
-  }
-};
+      // יצרנים
+      const makes = [...new Set(cars.map(c => c.make))];
+      const makeSelect = document.getElementById("make");
+      makes.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = m;
+        makeSelect.appendChild(opt);
+      });
 
-const esc = s => String(s ?? '').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m]));
-const num = v => {
-  if (v==null) return null;
-  if (typeof v==='number') return Number.isFinite(v)?v:null;
-  const n = Number(String(v).replace(/[^\d.,-]/g,'').replace(/,/g,''));
-  return Number.isFinite(n)?n:null;
-};
-
-function getLastScraped(arr){
-  let t=0; for(const r of arr){const d=Date.parse(r.scrapedAt||r.updated||''); if(!Number.isNaN(d)) t=Math.max(t,d);}
-  return t||null;
-}
-
-async function load(){
-  const res = await fetch('./cars.json',{cache:'no-store'});
-  const data = await res.json();
-  state.raw = Array.isArray(data)?data:(data.cars||[]);
-  normalize();
-  buildMakeModel();
-  analyzeNumerics();
-  analyzeFeatures();
-  renderFilters();
-  applyFilters(); // ראשוני
-}
-
-function normalize(){
-  state.cars = state.raw.map((r,i)=>{
-    const make=r.make||'', model=r.model||'', trim=r.trim||'';
-    const title=[make,model,trim].filter(Boolean).join(' ')||`דגם #${i+1}`;
-    return {
-      id:i, title,
-      make, model, trim,
-      price: num(r.price),
-      year: num(r.year),
-      engine: num(r.engine),
-      image: r.image||'',
-      source: r.source||r.url||'',
-      features: (r.features && typeof r.features==='object')? r.features : {},
-      specs: (r.specs && typeof r.specs==='object')? r.specs : {}
-    };
-  });
-  const t=getLastScraped(state.raw);
-  if(t) els.last.textContent='עודכן: '+new Date(t).toLocaleString('he-IL');
-}
-
-function buildMakeModel(){
-  const map = new Map();
-  for(const c of state.cars){
-    const m = (map.get(c.make)||new Set());
-    if (c.model) m.add(c.model);
-    map.set(c.make,m);
-  }
-  state.makeToModels = map;
-}
-
-function analyzeNumerics(){
-  const add = (bag,key,val)=>{
-    if(val==null) return;
-    if(!bag[key]) bag[key]={min:val,max:val};
-    else{ bag[key].min=Math.min(bag[key].min,val); bag[key].max=Math.max(bag[key].max,val); }
-  };
-  const general={}, specs={};
-  for(const c of state.cars){
-    add(general,'price',c.price);
-    add(general,'year',c.year);
-    add(general,'engine',c.engine);
-    if (c.specs && typeof c.specs==='object'){
-      for(const [k,v] of Object.entries(c.specs)){
-        const n=num(v); add(specs,k,n);
-      }
+      // מאפיינים (אבזור)
+      cars.forEach(c => {
+        if (c.features) {
+          c.features.forEach(f => allFeatures.add(f));
+        }
+      });
+      const featuresDiv = document.getElementById("features");
+      allFeatures.forEach(f => {
+        const label = document.createElement("label");
+        const cb = document.createElement("input");
+        cb.type = "checkbox";
+        cb.value = f;
+        label.appendChild(cb);
+        label.appendChild(document.createTextNode(f));
+        featuresDiv.appendChild(label);
+      });
     }
-  }
-  // השמט טווחים לא תקפים (null או min==max)
-  const prune = obj=>{
-    for(const [k,v] of Object.entries(obj)){
-      if(v.min==null || v.max==null || v.min===v.max){ delete obj[k]; }
-    }
-  };
-  prune(general); prune(specs);
-  state.numerics = {general,specs};
-}
 
-function analyzeFeatures(){
-  const keys=new Set();
-  for(const c of state.cars){
-    for(const [k,v] of Object.entries(c.features||{})){
-      if (typeof v === 'boolean') keys.add(k);
-    }
-  }
-  state.featureKeys = Array.from(keys);
-}
+    document.getElementById("make").addEventListener("change", (e) => {
+      const modelSelect = document.getElementById("model");
+      modelSelect.innerHTML = "<option value=''>בחר דגם</option>";
+      const selectedMake = e.target.value;
+      const models = [...new Set(cars.filter(c => c.make === selectedMake).map(c => c.model))];
+      models.forEach(m => {
+        const opt = document.createElement("option");
+        opt.value = m;
+        opt.textContent = m;
+        modelSelect.appendChild(opt);
+      });
+    });
 
-function optionList(opts, sel){
-  return opts.map(([v,t])=>`<option value="${esc(v)}"${v===sel?' selected':''}>${esc(t)}</option>`).join('');
-}
+    document.getElementById("search-btn").addEventListener("click", () => {
+      const filters = {
+        make: document.getElementById("make").value,
+        model: document.getElementById("model").value,
+        priceMin: +document.getElementById("price-min").value || 0,
+        priceMax: +document.getElementById("price-max").value || Infinity,
+        yearMin: +document.getElementById("year-min").value || 0,
+        yearMax: +document.getElementById("year-max").value || Infinity,
+        powerMin: +document.getElementById("power-min").value || 0,
+        powerMax: +document.getElementById("power-max").value || Infinity,
+        lengthMin: +document.getElementById("length-min").value || 0,
+        lengthMax: +document.getElementById("length-max").value || Infinity,
+        widthMin: +document.getElementById("width-min").value || 0,
+        widthMax: +document.getElementById("width-max").value || Infinity,
+        heightMin: +document.getElementById("height-min").value || 0,
+        heightMax: +document.getElementById("height-max").value || Infinity,
+        trunkMin: +document.getElementById("trunk-min").value || 0,
+        trunkMax: +document.getElementById("trunk-max").value || Infinity,
+        features: [...document.querySelectorAll("#features input:checked")].map(cb => cb.value)
+      };
 
-function renderFilters(){
-  // יצרן
-  const makeOpts = [['','כל היצרנים'], ...Array.from(state.makeToModels.keys()).filter(Boolean).sort().map(m=>[m,m])];
-  els.makeSel.innerHTML = optionList(makeOpts,state.filters.make);
-  els.makeSel.onchange = ()=>{
-    state.filters.make = els.makeSel.value;
-    renderModelSelect();
-  };
-  // דגם (ראשוני)
-  renderModelSelect();
+      const results = cars.filter(c => {
+        return (!filters.make || c.make === filters.make) &&
+               (!filters.model || c.model === filters.model) &&
+               (c.price >= filters.priceMin && c.price <= filters.priceMax) &&
+               (c.year >= filters.yearMin && c.year <= filters.yearMax) &&
+               (c.power >= filters.powerMin && c.power <= filters.powerMax) &&
+               (c.dimensions.length >= filters.lengthMin && c.dimensions.length <= filters.lengthMax) &&
+               (c.dimensions.width >= filters.widthMin && c.dimensions.width <= filters.widthMax) &&
+               (c.dimensions.height >= filters.heightMin && c.dimensions.height <= filters.heightMax) &&
+               (c.trunk >= filters.trunkMin && c.trunk <= filters.trunkMax) &&
+               filters.features.every(f => c.features.includes(f));
+      });
 
-  // כלליים (מחיר/שנה/engine אם קיים)
-  els.numericGeneral.innerHTML = '';
-  for(const [key,range] of Object.entries(state.numerics.general)){
-    els.numericGeneral.insertAdjacentHTML('beforeend', numericBoxHTML('general',key,range));
-  }
+      const resultsDiv = document.getElementById("results");
+      resultsDiv.innerHTML = "";
+      results.forEach(c => {
+        const card = document.createElement("div");
+        card.className = "car-card";
+        card.innerHTML = `
+          <img src="${c.image || 'https://via.placeholder.com/250'}" alt="${c.make} ${c.model}">
+          <h3>${c.make} ${c.model}</h3>
+          <p>מחיר: ${c.price} ₪</p>
+          <p>שנה: ${c.year}</p>
+          <p>כוח: ${c.power} כ"ס</p>
+        `;
+        resultsDiv.appendChild(card);
+      });
 
-  // specs
-  els.numericSpecs.innerHTML = '';
-  for(const [key,range] of Object.entries(state.numerics.specs)){
-    els.numericSpecs.insertAdjacentHTML('beforeend', numericBoxHTML('specs',key,range));
-  }
+      document.getElementById("search-screen").classList.add("hidden");
+      document.getElementById("results-screen").classList.remove("hidden");
+    });
 
-  // איבזור
-  els.featureBooleans.innerHTML = state.featureKeys.map(k=>{
-    const pretty = FEATURE_LABELS[k]||k;
-    const name = `feat_${k}`;
-    return `
-      <div class="box">
-        <div class="row">
-          <label>${esc(pretty)}</label>
-          <div class="tri">
-            ${TRI.map(([v,t])=>`
-              <label><input type="radio" name="${esc(name)}" value="${esc(v)}"${state.filters.features[k]===v?' checked':''}> ${esc(t)}</label>
-            `).join('')}
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-}
+    document.getElementById("back-btn").addEventListener("click", () => {
+      document.getElementById("results-screen").classList.add("hidden");
+      document.getElementById("search-screen").classList.remove("hidden");
+    });
 
-function renderModelSelect(){
-  const make = els.makeSel.value;
-  const set = state.makeToModels.get(make)||new Set();
-  const models = Array.from(set).filter(Boolean).sort();
-  const opts = [['','כל הדגמים'], ...models.map(m=>[m,m])];
-  els.modelSel.innerHTML = optionList(opts,state.filters.model);
-  els.modelSel.disabled = opts.length<=1;
-  els.modelSel.onchange = ()=>{ state.filters.model = els.modelSel.value; };
-}
-
-function numericBoxHTML(scope,key,range){
-  const idMin = `${scope}_${key}_min`, idMax = `${scope}_${key}_max`;
-  const label = prettyLabel(key);
-  const sel = state.filters[scope]?.[key] || {min:range.min, max:range.max};
-  // שמור ערכי ברירת מחדל אם לא קיימים
-  state.filters[scope] = state.filters[scope] || {};
-  state.filters[scope][key] = {min: sel.min, max: sel.max};
-
-  return `
-  <div class="box">
-    <label>${esc(label)}</label>
-    <div class="grid2">
-      <input id="${esc(idMin)}" type="number" inputmode="numeric" placeholder="מינימום" value="${sel.min}">
-      <input id="${esc(idMax)}" type="number" inputmode="numeric" placeholder="מקסימום" value="${sel.max}">
-    </div>
-    <div class="grid2" style="margin-top:6px">
-      <input type="range" min="${range.min}" max="${range.max}" value="${sel.min}" step="1" oninput="document.getElementById('${esc(idMin)}').value=this.value">
-      <input type="range" min="${range.min}" max="${range.max}" value="${sel.max}" step="1" oninput="document.getElementById('${esc(idMax)}').value=this.value">
-    </div>
-  </div>`;
-}
-
-function prettyLabel(k){
-  const map = {
-    price:'מחיר (₪)', year:'שנה', engine:'נפח/מנוע',
-    length:'אורך (מ״מ)', width:'רוחב (מ״מ)', height:'גובה (מ״מ)',
-    wheelbase:'בסיס גלגלים (מ״מ)', trunk:'תא מטען (ל׳)', powerHP:'כ״ס'
-  };
-  return map[k]||k;
-}
-
-function readFilterValues(){
-  // יצרן/דגם
-  state.filters.make = els.makeSel.value;
-  state.filters.model = els.modelSel.value;
-
-  // כלליים
-  for(const key of Object.keys(state.numerics.general)){
-    const min = Number(document.getElementById(`general_${key}_min`).value);
-    const max = Number(document.getElementById(`general_${key}_max`).value);
-    state.filters.general[key]={min,max};
-  }
-  // specs
-  for(const key of Object.keys(state.numerics.specs)){
-    const min = Number(document.getElementById(`specs_${key}_min`).value);
-    const max = Number(document.getElementById(`specs_${key}_max`).value);
-    state.filters.specs[key]={min,max};
-  }
-  // איבזור
-  for(const k of state.featureKeys){
-    const name=`feat_${k}`;
-    const r=[...document.querySelectorAll(`input[name="${CSS.escape(name)}"]`)].find(x=>x.checked);
-    state.filters.features[k]= r ? r.value : '';
-  }
-}
-
-function applyFilters(){
-  readFilterValues();
-
-  const chips=[];
-  if(state.filters.make) chips.push(state.filters.make);
-  if(state.filters.model) chips.push(state.filters.model);
-
-  let list = state.cars.filter(c=>{
-    if(state.filters.make && c.make!==state.filters.make) return false;
-    if(state.filters.model && c.model!==state.filters.model) return false;
-
-    // כלליים
-    for(const [k,{min,max}] of Object.entries(state.filters.general)){
-      const v = c[k];
-      if(v==null || v<min || v>max) return false;
-      if (min) chips.push(`${prettyLabel(k)} ≥ ${min}`);
-      if (max) chips.push(`${prettyLabel(k)} ≤ ${max}`);
-    }
-    // specs
-    for(const [k,{min,max}] of Object.entries(state.filters.specs)){
-      const v = num(c.specs[k]);
-      if(v==null || v<min || v>max) return false;
-    }
-    // איבזור
-    for(const [k,mode] of Object.entries(state.filters.features)){
-      if(!mode) continue; // הכל
-      const has = !!(c.features && c.features[k]===true);
-      if(mode==='true' && !has) return false;
-      if(mode==='false' && has) return false;
-    }
-    return true;
-  });
-
-  els.count.textContent = String(list.length);
-  els.chips.innerHTML = chips.length ? ' • ' + chips.map(t=>`<span class="chip">${esc(t)}</span>`).join(' ') : '';
-
-  // תצוגה מינימלית (אפשר להסתיר)
-  els.resultList.innerHTML = list.map(c=>{
-    const price = c.price!=null? (c.price.toLocaleString('he-IL')+' ₪') : '—';
-    return `
-      <div class="card item">
-        <div class="pic">${c.image?`<img src="${esc(c.image)}" alt="">`:'<span class="meta">אין תמונה</span>'}</div>
-        <div>
-          <div><b>${esc(c.title)}</b></div>
-          <div class="meta">
-            ${c.year?`שנה ${esc(c.year)} • `:''}
-            ${c.engine?`מנוע ${esc(c.engine)} • `:''}
-            מחיר: ${price}
-            ${c.source?` • <a href="${esc(c.source)}" target="_blank" rel="noopener">מקור</a>`:''}
-          </div>
-        </div>
-      </div>`;
-  }).join('');
-}
-
-els.apply.onclick = applyFilters;
-
-els.clear.onclick = ()=>{
-  state.filters={make:'',model:'',general:{},specs:{},features:{}};
-  renderFilters(); applyFilters();
-};
-
-els.toggleList.onclick = ()=>{
-  els.resultList.classList.toggle('hide');
-};
-
-load();
-</script>
+    loadData();
+  </script>
 </body>
 </html>
