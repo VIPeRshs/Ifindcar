@@ -299,7 +299,7 @@ function normalizeRaw(raw){
 /* ================== LOAD & INIT ================== */
 async function loadData(){
   try{
-    const res = await fetch('./cars.json', {cache:'no-store'});
+    const res = await fetch('cars.json', {cache:'no-store'});
     const raw = await res.json();
     DATA = Array.isArray(raw) ? raw : (raw.cars || []);
     CARS = normalizeRaw(DATA);
