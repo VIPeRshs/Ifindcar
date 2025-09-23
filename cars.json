@@ -1,50 +1,86 @@
 [
   {
-    "make": "Toyota",
-    "model": "Corolla",
-    "year": 2022,
-    "price": 135000,
-    "power": 132,
-    "engine": "בנזין",
-    "dimensions": {
-      "length": 4630,
-      "width": 1780,
-      "height": 1455
+    "id": "www-icar-co-il-D7-A1-D7-A7-D7-95-D7-93-D7-94-D7-A1-D7-A7-D7-95-D7-93-D7-94_-D7-90-D7-95-D7-A7-D7-98-D7-91-D7-99-D7-94-D7-A1-D7-A7-D7-95-D7-93-D7-94_-D7-90-D7-95-D7-A7-D7-98-D7-91-D7-99-D7-94_-D7-97-D7-93-D7-A9-version28104",
+    "source": "https://www.icar.co.il/%D7%A1%D7%A7%D7%95%D7%93%D7%94/%D7%A1%D7%A7%D7%95%D7%93%D7%94_%D7%90%D7%95%D7%A7%D7%98%D7%91%D7%99%D7%94/%D7%A1%D7%A7%D7%95%D7%93%D7%94_%D7%90%D7%95%D7%A7%D7%98%D7%91%D7%99%D7%94_%D7%97%D7%93%D7%A9/version28104/",
+    "make": "הדגם",
+    "model": "אינו משווק כרכב חדש סקודה אוקטביה 2025 רכב חדש 1.5 150 כ\"ס Selection",
+    "trim": "",
+    "year": null,
+    "price": null,
+    "gearbox": "התעניינת בסקודה אוקטביה רכב חדש לקבלת הצעות לקנייה יד שניה, מימון יד שניה, או טרייד אין השאר פרטים ואנו נדאג שנציג יצור עימך קשר בהקדם שדה חובה בחר סוג שירותקניית רכב יד שניהמימון לרכב יד שניהyrhhs thi * * מעוניין לקבל טיפים ומידע נוסף על קניית רכב לא מעוניין לקבל טיפים ומידע נוסף על קניית רכב",
+    "engine": 2025,
+    "image": "https://www.icar.co.il/_media/images/models/bgremoval/skoda-octavia-new.jpg",
+    "features": {
+      "cruise": true,
+      "rearCamera": false,
+      "keyless": false,
+      "laneAssist": false,
+      "aeb": true
     },
-    "trunk": 470,
-    "features": ["בקרת שיוט", "מצלמת רוורס", "מערכת מולטימדיה"],
-    "image": "https://www.toyota.co.il/media/Corolla.png"
+    "specs": {
+      "length": null,
+      "width": null,
+      "height": null,
+      "wheelbase": null,
+      "trunk": null,
+      "powerHP": 150
+    },
+    "scrapedAt": "2025-09-23T06:35:39.785Z"
   },
   {
-    "make": "Hyundai",
-    "model": "Ioniq 5",
-    "year": 2023,
-    "price": 210000,
-    "power": 170,
-    "engine": "חשמלי",
-    "dimensions": {
-      "length": 4635,
-      "width": 1890,
-      "height": 1605
+    "id": "www-icar-co-il-D7-A1-D7-99-D7-90-D7-98-D7-A1-D7-99-D7-90-D7-98_-D7-90-D7-98-D7-A7-D7-94-D7-A1-D7-99-D7-90-D7-98_-D7-90-D7-98-D7-A7-D7-94_-D7-97-D7-93-D7-A9-version15265",
+    "source": "https://www.icar.co.il/%D7%A1%D7%99%D7%90%D7%98/%D7%A1%D7%99%D7%90%D7%98_%D7%90%D7%98%D7%A7%D7%94/%D7%A1%D7%99%D7%90%D7%98_%D7%90%D7%98%D7%A7%D7%94_%D7%97%D7%93%D7%A9/version15265/",
+    "make": "סיאט",
+    "model": "אטקה 2025 רכב חדש 1.5 Style",
+    "trim": "",
+    "year": null,
+    "price": null,
+    "gearbox": "התעניינת בסיאט אטקה רכב חדש לקבלת הצעות לקנייה יד שניה, מימון יד שניה, או טרייד אין השאר פרטים ואנו נדאג שנציג יצור עימך קשר בהקדם שדה חובה בחר סוג שירותקניית רכב יד שניהמימון לרכב יד שניהyrhhs thi * * מעוניין לקבל טיפים ומידע נוסף על קניית רכב לא מעוניין לקבל טיפים ומידע נוסף על קניית רכב",
+    "engine": 2025,
+    "image": "https://www.icar.co.il/_media/images/models/bgremoval/seat-ateca-new.jpg",
+    "features": {
+      "cruise": true,
+      "rearCamera": false,
+      "keyless": false,
+      "laneAssist": false,
+      "aeb": true
     },
-    "trunk": 527,
-    "features": ["טעינה אלחוטית", "בקרת שיוט אדפטיבית", "מערכת סונאר"],
-    "image": "https://www.hyundai.com/content/dam/hyundai/ww/en/images/ioniq5/ioniq5.png"
+    "specs": {
+      "length": null,
+      "width": null,
+      "height": null,
+      "wheelbase": null,
+      "trunk": null,
+      "powerHP": null
+    },
+    "scrapedAt": "2025-09-23T06:35:41.745Z"
   },
   {
-    "make": "Mazda",
-    "model": "CX-5",
-    "year": 2021,
-    "price": 165000,
-    "power": 165,
-    "engine": "בנזין",
-    "dimensions": {
-      "length": 4550,
-      "width": 1840,
-      "height": 1680
+    "id": "www-icar-co-il-D7-A7-D7-95-D7-A4-D7-A8-D7-94-D7-A7-D7-95-D7-A4-D7-A8-D7-94_-D7-A4-D7-95-D7-A8-D7-9E-D7-A0-D7-98-D7-95-D7-A8-D7-A7-D7-95-D7-A4-D7-A8-D7-94_-D7-A4-D7-95-D7-A8-D7-9E-D7-A0-D7-98-D7-95-D7-A8_-D7-97-D7-93-D7-A9-version28136",
+    "source": "https://www.icar.co.il/%D7%A7%D7%95%D7%A4%D7%A8%D7%94/%D7%A7%D7%95%D7%A4%D7%A8%D7%94_%D7%A4%D7%95%D7%A8%D7%9E%D7%A0%D7%98%D7%95%D7%A8/%D7%A7%D7%95%D7%A4%D7%A8%D7%94_%D7%A4%D7%95%D7%A8%D7%9E%D7%A0%D7%98%D7%95%D7%A8_%D7%97%D7%93%D7%A9/version28136/",
+    "make": "קופרה",
+    "model": "פורמנטור 2025 רכב חדש 2.0 טורבו-בנזין 333 כ\"ס VZ 4X4",
+    "trim": "",
+    "year": null,
+    "price": null,
+    "gearbox": "התעניינת בקופרה פורמנטור רכב חדש לקבלת הצעות לקנייה יד שניה, מימון יד שניה, או טרייד אין השאר פרטים ואנו נדאג שנציג יצור עימך קשר בהקדם שדה חובה בחר סוג שירותקניית רכב יד שניהמימון לרכב יד שניהyrhhs thi * * מעוניין לקבל טיפים ומידע נוסף על קניית רכב לא מעוניין לקבל טיפים ומידע נוסף על קניית רכב",
+    "engine": 2025,
+    "image": "https://www.icar.co.il/_media/images/models/bgremoval/cupra-formentor-new.jpg",
+    "features": {
+      "cruise": true,
+      "rearCamera": false,
+      "keyless": false,
+      "laneAssist": false,
+      "aeb": true
     },
-    "trunk": 506,
-    "features": ["בקרת אקלים", "חיישני חניה", "מערכת בלימה אוטונומית"],
-    "image": "https://www.mazda.co.il/media/cx5.png"
+    "specs": {
+      "length": null,
+      "width": null,
+      "height": null,
+      "wheelbase": null,
+      "trunk": null,
+      "powerHP": 333
+    },
+    "scrapedAt": "2025-09-23T06:35:43.900Z"
   }
-] 
+]
