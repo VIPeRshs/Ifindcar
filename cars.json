@@ -3,7 +3,7 @@
     "id": "www-icar-co-il-D7-A1-D7-99-D7-90-D7-98-D7-A1-D7-99-D7-90-D7-98_-D7-90-D7-98-D7-A7-D7-94-D7-A1-D7-99-D7-90-D7-98_-D7-90-D7-98-D7-A7-D7-94_-D7-97-D7-93-D7-A9-version15265",
     "source": "https://www.icar.co.il/%D7%A1%D7%99%D7%90%D7%98/%D7%A1%D7%99%D7%90%D7%98_%D7%90%D7%98%D7%A7%D7%94/%D7%A1%D7%99%D7%90%D7%98_%D7%90%D7%98%D7%A7%D7%94_%D7%97%D7%93%D7%A9/version15265/",
     "make": "סיאט",
-    "model": "אטקה 2025 רכב חדש 1.5 Style",
+    "model": "אטקה 2026 רכב חדש 1.5 Style",
     "trim": "",
     "year": null,
     "price": null,
@@ -25,13 +25,13 @@
       "trunk": null,
       "powerHP": null
     },
-    "scrapedAt": "2026-01-01T06:41:23.053Z"
+    "scrapedAt": "2026-01-02T06:41:36.395Z"
   },
   {
     "id": "www-icar-co-il-D7-A1-D7-A7-D7-95-D7-93-D7-94-D7-A1-D7-A7-D7-95-D7-93-D7-94_-D7-90-D7-95-D7-A7-D7-98-D7-91-D7-99-D7-94-D7-A1-D7-A7-D7-95-D7-93-D7-94_-D7-90-D7-95-D7-A7-D7-98-D7-91-D7-99-D7-94_-D7-97-D7-93-D7-A9-version28104",
     "source": "https://www.icar.co.il/%D7%A1%D7%A7%D7%95%D7%93%D7%94/%D7%A1%D7%A7%D7%95%D7%93%D7%94_%D7%90%D7%95%D7%A7%D7%98%D7%91%D7%99%D7%94/%D7%A1%D7%A7%D7%95%D7%93%D7%94_%D7%90%D7%95%D7%A7%D7%98%D7%91%D7%99%D7%94_%D7%97%D7%93%D7%A9/version28104/",
     "make": "סקודה",
-    "model": "אוקטביה 2025 רכב חדש 1.5 150 כ\"ס Selection",
+    "model": "אוקטביה 2026 רכב חדש 1.5 150 כ\"ס Selection",
     "trim": "",
     "year": null,
     "price": null,
@@ -53,13 +53,13 @@
       "trunk": null,
       "powerHP": 150
     },
-    "scrapedAt": "2026-01-01T06:41:21.151Z"
+    "scrapedAt": "2026-01-02T06:41:34.479Z"
   },
   {
     "id": "www-icar-co-il-D7-A7-D7-95-D7-A4-D7-A8-D7-94-D7-A7-D7-95-D7-A4-D7-A8-D7-94_-D7-A4-D7-95-D7-A8-D7-9E-D7-A0-D7-98-D7-95-D7-A8-D7-A7-D7-95-D7-A4-D7-A8-D7-94_-D7-A4-D7-95-D7-A8-D7-9E-D7-A0-D7-98-D7-95-D7-A8_-D7-97-D7-93-D7-A9-version28136",
     "source": "https://www.icar.co.il/%D7%A7%D7%95%D7%A4%D7%A8%D7%94/%D7%A7%D7%95%D7%A4%D7%A8%D7%94_%D7%A4%D7%95%D7%A8%D7%9E%D7%A0%D7%98%D7%95%D7%A8/%D7%A7%D7%95%D7%A4%D7%A8%D7%94_%D7%A4%D7%95%D7%A8%D7%9E%D7%A0%D7%98%D7%95%D7%A8_%D7%97%D7%93%D7%A9/version28136/",
     "make": "קופרה",
-    "model": "פורמנטור 2025 רכב חדש 2.0 טורבו-בנזין 333 כ\"ס VZ 4X4",
+    "model": "פורמנטור 2026 רכב חדש 2.0 טורבו-בנזין 333 כ\"ס VZ 4X4",
     "trim": "",
     "year": null,
     "price": null,
@@ -81,6 +81,6 @@
       "trunk": null,
       "powerHP": 333
     },
-    "scrapedAt": "2026-01-01T06:41:24.968Z"
+    "scrapedAt": "2026-01-02T06:41:38.278Z"
   }
 ]
