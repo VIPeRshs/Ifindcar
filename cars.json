@@ -1,49 +1,21 @@
 [
   {
-    "id": "www-icar-co-il-D7-A1-D7-A7-D7-95-D7-93-D7-94-D7-A1-D7-A7-D7-95-D7-93-D7-94_-D7-90-D7-95-D7-A7-D7-98-D7-91-D7-99-D7-94-D7-A1-D7-A7-D7-95-D7-93-D7-94_-D7-90-D7-95-D7-A7-D7-98-D7-91-D7-99-D7-94_-D7-97-D7-93-D7-A9-version28104",
-    "source": "https://www.icar.co.il/%D7%A1%D7%A7%D7%95%D7%93%D7%94/%D7%A1%D7%A7%D7%95%D7%93%D7%94_%D7%90%D7%95%D7%A7%D7%98%D7%91%D7%99%D7%94/%D7%A1%D7%A7%D7%95%D7%93%D7%94_%D7%90%D7%95%D7%A7%D7%98%D7%91%D7%99%D7%94_%D7%97%D7%93%D7%A9/version28104/",
-    "make": "403",
-    "model": "ERROR",
-    "trim": "",
-    "year": null,
-    "price": null,
-    "gearbox": null,
-    "engine": null,
-    "image": null,
-    "features": {
-      "cruise": false,
-      "rearCamera": false,
-      "keyless": false,
-      "laneAssist": false,
-      "aeb": false
-    },
-    "specs": {
-      "length": null,
-      "width": null,
-      "height": null,
-      "wheelbase": null,
-      "trunk": null,
-      "powerHP": null
-    },
-    "scrapedAt": "2026-06-03T11:10:28.481Z"
-  },
-  {
     "id": "www-icar-co-il-D7-A1-D7-99-D7-90-D7-98-D7-A1-D7-99-D7-90-D7-98_-D7-90-D7-98-D7-A7-D7-94-D7-A1-D7-99-D7-90-D7-98_-D7-90-D7-98-D7-A7-D7-94_-D7-97-D7-93-D7-A9-version15265",
     "source": "https://www.icar.co.il/%D7%A1%D7%99%D7%90%D7%98/%D7%A1%D7%99%D7%90%D7%98_%D7%90%D7%98%D7%A7%D7%94/%D7%A1%D7%99%D7%90%D7%98_%D7%90%D7%98%D7%A7%D7%94_%D7%97%D7%93%D7%A9/version15265/",
-    "make": "403",
-    "model": "ERROR",
+    "make": "הדגם",
+    "model": "אינו משווק כרכב חדש סיאט אטקה 2026 רכב חדש 1.5 Style",
     "trim": "",
     "year": null,
     "price": null,
-    "gearbox": null,
-    "engine": null,
-    "image": null,
+    "gearbox": "התעניינת בסיאט אטקה רכב חדש לקבלת הצעות לקנייה יד שניה, מימון יד שניה, או טרייד אין השאר פרטים ואנו נדאג שנציג יצור עימך קשר בהקדם שדה חובה בחר סוג שירותקניית רכב יד שניהמימון לרכב יד שניהyrhhs thi * * מעוניין לקבל טיפים ומידע נוסף על קניית רכב לא מעוניין לקבל טיפים ומידע נוסף על קניית רכב",
+    "engine": 2026,
+    "image": "https://www.icar.co.il/_media/images/models/bgremoval/seat-ateca-new.jpg",
     "features": {
-      "cruise": false,
+      "cruise": true,
       "rearCamera": false,
       "keyless": false,
       "laneAssist": false,
-      "aeb": false
+      "aeb": true
     },
     "specs": {
       "length": null,
@@ -53,25 +25,53 @@
       "trunk": null,
       "powerHP": null
     },
-    "scrapedAt": "2026-06-03T11:10:30.005Z"
+    "scrapedAt": "2026-06-04T10:04:19.343Z"
+  },
+  {
+    "id": "www-icar-co-il-D7-A1-D7-A7-D7-95-D7-93-D7-94-D7-A1-D7-A7-D7-95-D7-93-D7-94_-D7-90-D7-95-D7-A7-D7-98-D7-91-D7-99-D7-94-D7-A1-D7-A7-D7-95-D7-93-D7-94_-D7-90-D7-95-D7-A7-D7-98-D7-91-D7-99-D7-94_-D7-97-D7-93-D7-A9-version28104",
+    "source": "https://www.icar.co.il/%D7%A1%D7%A7%D7%95%D7%93%D7%94/%D7%A1%D7%A7%D7%95%D7%93%D7%94_%D7%90%D7%95%D7%A7%D7%98%D7%91%D7%99%D7%94/%D7%A1%D7%A7%D7%95%D7%93%D7%94_%D7%90%D7%95%D7%A7%D7%98%D7%91%D7%99%D7%94_%D7%97%D7%93%D7%A9/version28104/",
+    "make": "סקודה",
+    "model": "אוקטביה 2026 רכב חדש 1.5 150 כ\"ס Selection",
+    "trim": "",
+    "year": null,
+    "price": null,
+    "gearbox": "התעניינת בסקודה אוקטביה רכב חדש לקבלת הצעות לקנייה יד שניה, מימון יד שניה, או טרייד אין השאר פרטים ואנו נדאג שנציג יצור עימך קשר בהקדם שדה חובה בחר סוג שירותקניית רכב יד שניהמימון לרכב יד שניהyrhhs thi * * מעוניין לקבל טיפים ומידע נוסף על קניית רכב לא מעוניין לקבל טיפים ומידע נוסף על קניית רכב",
+    "engine": 2026,
+    "image": "https://www.icar.co.il/_media/images/models/bgremoval/skoda-octavia-new.jpg",
+    "features": {
+      "cruise": true,
+      "rearCamera": false,
+      "keyless": false,
+      "laneAssist": false,
+      "aeb": true
+    },
+    "specs": {
+      "length": null,
+      "width": null,
+      "height": null,
+      "wheelbase": null,
+      "trunk": null,
+      "powerHP": 150
+    },
+    "scrapedAt": "2026-06-04T10:04:17.489Z"
   },
   {
     "id": "www-icar-co-il-D7-A7-D7-95-D7-A4-D7-A8-D7-94-D7-A7-D7-95-D7-A4-D7-A8-D7-94_-D7-A4-D7-95-D7-A8-D7-9E-D7-A0-D7-98-D7-95-D7-A8-D7-A7-D7-95-D7-A4-D7-A8-D7-94_-D7-A4-D7-95-D7-A8-D7-9E-D7-A0-D7-98-D7-95-D7-A8_-D7-97-D7-93-D7-A9-version28136",
     "source": "https://www.icar.co.il/%D7%A7%D7%95%D7%A4%D7%A8%D7%94/%D7%A7%D7%95%D7%A4%D7%A8%D7%94_%D7%A4%D7%95%D7%A8%D7%9E%D7%A0%D7%98%D7%95%D7%A8/%D7%A7%D7%95%D7%A4%D7%A8%D7%94_%D7%A4%D7%95%D7%A8%D7%9E%D7%A0%D7%98%D7%95%D7%A8_%D7%97%D7%93%D7%A9/version28136/",
-    "make": "403",
-    "model": "ERROR",
+    "make": "קופרה",
+    "model": "פורמנטור 2026 רכב חדש 2.0 טורבו-בנזין 333 כ\"ס VZ 4X4",
     "trim": "",
     "year": null,
     "price": null,
-    "gearbox": null,
-    "engine": null,
-    "image": null,
+    "gearbox": "התעניינת בקופרה פורמנטור רכב חדש לקבלת הצעות לקנייה יד שניה, מימון יד שניה, או טרייד אין השאר פרטים ואנו נדאג שנציג יצור עימך קשר בהקדם שדה חובה בחר סוג שירותקניית רכב יד שניהמימון לרכב יד שניהyrhhs thi * * מעוניין לקבל טיפים ומידע נוסף על קניית רכב לא מעוניין לקבל טיפים ומידע נוסף על קניית רכב",
+    "engine": 2026,
+    "image": "https://www.icar.co.il/_media/images/models/bgremoval/cupra-formentor-new.jpg",
     "features": {
-      "cruise": false,
+      "cruise": true,
       "rearCamera": false,
       "keyless": false,
       "laneAssist": false,
-      "aeb": false
+      "aeb": true
     },
     "specs": {
       "length": null,
@@ -79,8 +79,8 @@
       "height": null,
       "wheelbase": null,
       "trunk": null,
-      "powerHP": null
+      "powerHP": 333
     },
-    "scrapedAt": "2026-06-03T11:10:31.528Z"
+    "scrapedAt": "2026-06-04T10:04:21.241Z"
   }
 ]
