@@ -34,7 +34,7 @@ system of record.
 - Everything the current board does: status board with 4 columns and
   drag-to-move, "what to work on now" strip, "needs attention" panel, quick
   add, project filter, task editor, dated updates.
-- Projects with members; tasks with assignee; reassignment.
+- Projects with a PM and participants; tasks with assignee; reassignment.
 - Manager → reports relationship.
 - Personal meetings area, private to each user.
 - One-time import of the existing sheet.
@@ -80,7 +80,8 @@ The owner picked Flutter + Firebase.
 - New dedicated repository (owner creates it; session cannot).
 - Firebase Auth (Google sign-in) + Cloud Firestore.
 - Sheet is a one-time import, then retired.
-- Project members see all tasks in their projects.
+- Each project has a PM chosen at creation; anyone can hold tasks in a
+  project without owning it; participants see all tasks in the project.
 - Managers see all tasks of their direct reports, in any project.
 - Not everyone is managed by the owner; manager is a per-user relationship.
 - Each user has a private personal area (meetings).
@@ -90,41 +91,39 @@ The owner picked Flutter + Firebase.
 
 ### 6.1 Roles and visibility
 
+See ADR-001 (`docs/adr/ADR-001-project-manager-and-participants.md`).
+
 - **User**: anyone signed in who has been added to the team.
-- **Admin**: can add users, set each user's manager, create projects. The
-  owner is the first admin. *(Builder's call recorded: admin role is needed
-  because someone must set up people and managers.)*
-- **Manager of X**: user listed as X's `managerId`. Direct reports only
+- **Admin**: can add users, set each user's line manager, create projects.
+  The owner is the first admin.
+- **Line manager of X**: user listed as X's `managerId`. Direct reports only
   (not transitive) in v1.
-- **Project member**: listed in the project's `memberIds`.
+- **Project manager (PM)**: the single `pmId` chosen when the project is
+  created (not necessarily the creator).
+- **Project participant**: in the project's `participantIds`: the PM, anyone
+  ever assigned a task there (added automatically), and anyone the PM adds.
+  Users can hold tasks in a project without owning it. Participation is
+  sticky; the PM can remove someone only if they have no open tasks there.
 
-A user can **read** a task if any of:
-1. they are a member of the task's project;
-2. they manage the task's assignee;
-3. they are an admin.
+| Action | Who |
+|---|---|
+| Create project, choose its PM | Admins and line managers *(proposal, awaiting owner)* |
+| Change a project's PM | Admin, or current PM |
+| Edit project, add/remove participants | PM, admin |
+| Create a task in a project | Any participant; PM; a line manager for a report |
+| Assign / reassign a task to anyone on the team | PM; assignee's line manager; admin |
+| Read all tasks in a project | Participants, PM, admin |
+| Read some tasks in a project | Line managers: their reports' tasks only |
+| Edit a task (status, fields, updates) | Anyone who can read it |
+| Move a task to another project | Same right as creating a task there |
 
-A user can **edit** a task (status, fields, add updates) if they can read it.
+A line manager who is not a participant sees the project's name and dates
+(needed on cards and filters), but only their reports' tasks in it.
 
-A user can **create** a task in any project they are a member of; a manager
-can also create a task assigned to a report in any project that report is a
-member of. **Moving a task to another project** needs the same right as
-creating a task in the target project. *(My calls.)*
-
-A manager who is not a member of a project sees that project's name and
-dates (needed on cards and filters), but only their reports' tasks in it,
-not the project's other tasks. *(My call.)*
-
-Membership and user changes *(my calls)*:
-- Removing a member from a project who still has open tasks there is
-  blocked until those tasks are reassigned.
+User changes *(my calls)*:
 - Deactivating a user (`active: false`) blocks their sign-in; their tasks
-  stay where they are and show as "inactive user" so a manager or admin
-  reassigns them.
-- Changing a user's manager updates `assigneeManagerId` on all their tasks.
-A user can **reassign** a task if they are: the assignee's manager, the
-project owner, or an admin. *(My proposal; owner may narrow to managers only.)*
-When reassigning to someone who is not a project member, that person is
-added to the project automatically.
+  stay and show as "inactive user" so a PM, line manager or admin reassigns them.
+- Changing a user's line manager updates `assigneeManagerId` on all their tasks.
 
 Personal area: readable/writable by its owner only. Admins do **not** see
 others' personal areas.
@@ -146,8 +145,8 @@ invites/{email}          # admin pre-registers an email; on first sign-in
 
 projects/{projectId}
   name                    # e.g. "גלים גבוהים 872"
-  ownerId: uid
-  memberIds: [uid]
+  pmId: uid               # project manager, chosen at creation
+  participantIds: [uid]   # PM + task assignees (auto) + manual adds; sticky
   startDate, endDate: date | null      # for Gantt
   archived: bool
 
@@ -165,7 +164,7 @@ tasks/{taskId}
   lastUpdateText, lastUpdateAt   # denormalized for cards/attention panel
   createdAt, createdBy, updatedAt
   # denormalized for security rules / queries:
-  projectMemberIds: [uid]
+  projectParticipantIds: [uid]
   assigneeManagerId: uid | null
 
 tasks/{taskId}/updates/{updateId}
@@ -176,9 +175,9 @@ users/{uid}/meetings/{meetingId}     # private
   date, start, end, title, location
 ```
 
-Denormalized fields (`projectMemberIds`, `assigneeManagerId`) keep security
+Denormalized fields (`projectParticipantIds`, `assigneeManagerId`) keep security
 rules cheap and let the app query "tasks I can see" with array-contains /
-equality queries. They must be kept consistent when project membership or a
+equality queries. They must be kept consistent when project participants or a
 user's manager changes. Cloud Functions need Firebase's paid Blaze plan, so
 v1 stays on the free Spark plan and does this with **client batch writes**,
 with Security Rules validating the denormalized fields. *(My call.)*
@@ -204,8 +203,9 @@ Priority labels: גבוהה / בינונית / נמוכה.
 3. **Task editor** — title, project, assignee (picker limited by reassign
    rights), start date, due date, status, priority, details, add update;
    full update history list.
-4. **Projects** — list of my projects; project page with members, dates,
-   its tasks. Admin/owner can add/remove members.
+4. **Projects** — list of my projects; project page with PM, participants,
+   dates, its tasks. PM/admin can add/remove participants. "New project":
+   name, PM picker, dates, optional participants.
 5. **My team** (managers only) — reports listed with their open/overdue
    counts; tap → board filtered to that person.
 6. **Personal** — my meetings: list by day, add/edit/delete.
@@ -228,8 +228,8 @@ Run once by an admin, from the app (web or Android):
 - Reads `מעקב משימות` and `פגישות` from sheet ID
   `1Bbo5uoUXLtiKYRpu9npCU-jLvpW-XhGHKjmcuQnlez4` using the signed-in
   admin's Google account (Sheets read-only scope).
-- Creates a project per distinct `תחום / פרויקט` value (owner = importer,
-  members = [importer]).
+- Creates a project per distinct `תחום / פרויקט` value (PM = importer,
+  participants = [importer]).
 - Creates tasks assigned to the importer, keeping their `מזהה` as `number`.
 - Parses `DD/MM/YYYY` dates; the update column becomes the first update
   entry, dated from its trailing `(DD/MM/YYYY)`.
