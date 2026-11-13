@@ -107,7 +107,7 @@ See ADR-001 (`docs/adr/ADR-001-project-manager-and-participants.md`).
 
 | Action | Who |
 |---|---|
-| Create project, choose its PM | Admins and line managers *(proposal, awaiting owner)* |
+| Create project, choose its PM | Admins, line managers, and users with the PM role |
 | Change a project's PM | Admin, or current PM |
 | Edit project, add/remove participants | PM, admin |
 | Create a task in a project | Any participant; PM; a line manager for a report |
@@ -137,6 +137,7 @@ users/{uid}
   displayName, email, photoUrl
   managerId: uid | null
   isAdmin: bool
+  isPM: bool              # may create projects and be picked as a PM
   active: bool
 
 invites/{email}          # admin pre-registers an email; on first sign-in

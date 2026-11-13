@@ -1,6 +1,6 @@
 # ADR-001: Project manager role and task-driven project participation
 
-**Status:** Proposed
+**Status:** Accepted
 **Date:** 2026-11-13
 **Deciders:** App owner (team lead)
 
@@ -43,7 +43,7 @@ rules and queries stay simple and nobody sees too much or too little.
 
 | Action | Who |
 |---|---|
-| Create project, choose its PM | Admins and line managers *(proposal)* |
+| Create project, choose its PM | Admins, line managers, and users with the PM role |
 | Change a project's PM | Admin, or the current PM |
 | Edit project details/dates, add or remove participants | PM, admin |
 | Create a task in the project | Any participant; the PM; a line manager for a report |
@@ -130,7 +130,7 @@ keeps "my projects" lists clean.
 
 ## Action Items
 
-1. [ ] Owner confirms who may create projects (admins + line managers, or admins only).
+1. [x] Owner confirmed: admins, line managers and users with the PM role create projects.
 2. [ ] Update the design spec: `ownerId` → `pmId`, `memberIds` → `participantIds`, and the rights table above.
 3. [ ] Write Security Rules for the table above, with emulator tests for each row.
 4. [ ] "New project" screen: name, PM picker, dates, optional participants.
